@@ -42,7 +42,7 @@ public class User implements UserDetails {
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Reservation> reservations = new LinkedHashSet<>();
 
     @Override
@@ -67,7 +67,4 @@ public class User implements UserDetails {
         return enabled;
     }
 
-    UserResponseDto toUserResponseDto() {
-        return new UserResponseDto(id, name, email, username, phone);
-    }
 }
