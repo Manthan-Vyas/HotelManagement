@@ -1,5 +1,6 @@
 package com.akm.hotelmanagement.entity;
 
+import com.akm.hotelmanagement.entity.util.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -36,7 +36,7 @@ public class User implements UserDetails {
     private String phone;
 
     @Column(name = "role", nullable = false)
-    private String role;
+    private UserRole role;
 
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
@@ -46,9 +46,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Stream.of(role.split(","))
-                .map(SimpleGrantedAuthority::new)
-                .toList();
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
