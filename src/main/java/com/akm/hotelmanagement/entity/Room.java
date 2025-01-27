@@ -1,5 +1,6 @@
 package com.akm.hotelmanagement.entity;
 
+import com.akm.hotelmanagement.entity.util.RoomStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +34,9 @@ public class Room {
 
     @Column(name = "price_per_night", nullable = false)
     private double pricePerNight;
+
+    @Column(name = "status", nullable = false)
+    private RoomStatus status;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "room_images", joinColumns = @JoinColumn(name = "room_id"))
