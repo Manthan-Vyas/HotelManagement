@@ -10,7 +10,7 @@ import java.time.LocalDate;
  * DTO for {@link com.akm.hotelmanagement.entity.Reservation}
  */
 @Value
-public class CreateUserRoomReservationRequestDto implements Serializable {
+public class CreateOrUpdateUserRoomReservationRequestDto implements Serializable {
     @FutureOrPresent(message = "Invalid check-in date")
     LocalDate checkIn;
     @Future(message = "Invalid check-out date")
