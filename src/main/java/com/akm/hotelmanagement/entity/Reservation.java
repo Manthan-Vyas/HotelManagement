@@ -1,5 +1,6 @@
 package com.akm.hotelmanagement.entity;
 
+import com.akm.hotelmanagement.entity.util.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +35,7 @@ public class Reservation {
     private LocalDate reservationDate;
 
     @Column(name = "status", nullable = false)
-    private String status;
+    private ReservationStatus status;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

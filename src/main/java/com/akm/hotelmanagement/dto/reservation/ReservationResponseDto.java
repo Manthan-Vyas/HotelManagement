@@ -3,6 +3,7 @@ package com.akm.hotelmanagement.dto.reservation;
 import com.akm.hotelmanagement.dto.room.RoomResponseDto;
 import com.akm.hotelmanagement.dto.user.UserResponseDto;
 import com.akm.hotelmanagement.entity.Reservation;
+import com.akm.hotelmanagement.entity.util.ReservationStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Value;
 
@@ -20,7 +21,7 @@ public class ReservationResponseDto implements Serializable {
     int numberOfGuests;
     double totalPrice;
     LocalDate reservationDate;
-    String status;
+    ReservationStatus status;
     @JsonBackReference
     UserResponseDto user;
     @JsonBackReference
