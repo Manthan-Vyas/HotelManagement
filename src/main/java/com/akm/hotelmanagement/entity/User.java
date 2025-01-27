@@ -1,6 +1,5 @@
 package com.akm.hotelmanagement.entity;
 
-import com.akm.hotelmanagement.dto.user.UserResponseDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

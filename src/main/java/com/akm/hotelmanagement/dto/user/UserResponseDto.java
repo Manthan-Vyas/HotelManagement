@@ -1,7 +1,6 @@
 package com.akm.hotelmanagement.dto.user;
 
 import com.akm.hotelmanagement.dto.reservation.ReservationResponseDto;
-import com.akm.hotelmanagement.entity.User;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Value;
 
