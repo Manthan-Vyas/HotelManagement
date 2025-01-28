@@ -1,4 +1,4 @@
-package com.akm.hotelmanagement.util.mapper;
+package com.akm.hotelmanagement.mapper;
 
 import com.akm.hotelmanagement.dto.room.CreateHotelRoomRequestDto;
 import com.akm.hotelmanagement.dto.room.UpdateHotelRoomRequestDto;
