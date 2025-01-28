@@ -11,10 +11,10 @@ import java.time.LocalDate;
  */
 @Value
 public class CreateOrUpdateUserRoomReservationRequestDto implements Serializable {
-    @FutureOrPresent(message = "Invalid check-in date")
+    @FutureOrPresent(message = "{error.reservation.check-in.before-today}")
     LocalDate checkIn;
-    @Future(message = "Invalid check-out date")
+    @Future(message = "{error.reservation.check-out.before-check-in}")
     LocalDate checkOut;
-    @Positive(message = "Invalid number of guests")
+    @Positive(message = "{error.reservation.number-of-guests}")
     int numberOfGuests;
 }

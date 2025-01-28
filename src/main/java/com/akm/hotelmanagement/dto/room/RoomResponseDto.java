@@ -20,7 +20,7 @@ public class RoomResponseDto implements Serializable {
     int number;
     String type;
     String description;
-    int numberOfBeds;
+    int capacity;
     double pricePerNight;
     RoomStatus status;
     Set<String> imageUrls;

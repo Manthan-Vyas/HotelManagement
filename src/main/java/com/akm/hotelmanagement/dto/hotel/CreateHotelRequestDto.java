@@ -1,9 +1,6 @@
 package com.akm.hotelmanagement.dto.hotel;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Value;
 
 import java.io.Serializable;
@@ -14,26 +11,26 @@ import java.util.Set;
  */
 @Value
 public class CreateHotelRequestDto implements Serializable {
-    @Size(min = 5, max = 20, message = "Name must be between 5 and 20 characters long")
-    @NotBlank(message = "Name is mandatory")
+    @Size(min = 2, max = 50, message = "{error.hotel.name.size}")
+    @NotBlank(message = "{error.required.name}")
     String name;
-    @Size(min = 5, max = 20, message = "Address must be between 5 and 20 characters long")
-    @NotBlank(message = "Address is mandatory")
+    @Size(min = 5, max = 100, message = "{error.hotel.address.size}")
+    @NotBlank(message = "{error.required.address}")
     String address;
-    @Size(min = 5, max = 20, message = "City must be between 5 and 20 characters long")
-    @NotBlank(message = "City is mandatory")
+    @Size(min = 2, max = 50, message = "{error.hotel.city.size}")
+    @NotBlank(message = "{error.required.city}")
     String city;
-    @Size(min = 5, max = 20, message = "State must be between 5 and 20 characters long")
-    @NotBlank(message = "State is mandatory")
+    @Size(min = 2, max = 50, message = "{error.hotel.state.size}")
+    @NotBlank(message = "{error.required.state}")
     String state;
-    @Size(min = 5, max = 20, message = "Country must be between 5 and 20 characters long")
-    @NotBlank(message = "Country is mandatory")
+    @Pattern(regexp = "^\\d{6}$", message = "{error.invalid.zip.pattern}")
+    @NotBlank(message = "{error.required.zip}")
     String zip;
-    @Size(min = 5, max = 20, message = "Description must be between 5 and 20 characters long")
-    @NotBlank(message = "Description is mandatory")
+    @Size(min = 5, max = 200, message = "{error.hotel.description.size}")
+    @NotBlank(message = "{error.required.description}")
     String description;
-    @Max(value = 5, message = "Rating must be less than or equal to 5")
-    @PositiveOrZero(message = "Rating must be greater than or equal to 0")
+    @Max(value = 5, message = "{error.hotel.rating}")
+    @PositiveOrZero(message = "{error.hotel.rating}")
     double rating;
     Set<String> imageUrls;
 }

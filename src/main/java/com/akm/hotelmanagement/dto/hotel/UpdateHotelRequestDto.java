@@ -2,6 +2,7 @@ package com.akm.hotelmanagement.dto.hotel;
 
 import com.akm.hotelmanagement.validation.NullableNotBlank;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.Value;
@@ -15,26 +16,26 @@ import java.util.Set;
  */
 @Value
 public class UpdateHotelRequestDto implements Serializable {
-    @NullableNotBlank(message = "Name should either be null or not blank")
-    @Size(min = 5, max = 20, message = "Name must be between 5 and 20 characters long")
+    @NullableNotBlank(message = "{error.nullable.blank.name}")
+    @Size(min = 2, max = 50, message = "{error.hotel.name.size}")
     String name;
-    @NullableNotBlank(message = "Address should either be null or not blank")
-    @Size(min = 5, max = 20, message = "Address must be between 5 and 20 characters long")
+    @NullableNotBlank(message = "{error.nullable.blank.address}")
+    @Size(min = 5, max = 100, message = "{error.hotel.address.size}")
     String address;
-    @NullableNotBlank(message = "City should either be null or not blank")
-    @Size(min = 5, max = 20, message = "City must be between 5 and 20 characters long")
+    @NullableNotBlank(message = "{error.nullable.blank.city}")
+    @Size(min = 2, max = 50, message = "{error.hotel.city.size}")
     String city;
-    @NullableNotBlank(message = "State should either be null or not blank")
-    @Size(min = 5, max = 20, message = "State must be between 5 and 20 characters long")
+    @NullableNotBlank(message = "{error.nullable.blank.state}")
+    @Size(min = 2, max = 50, message = "{error.hotel.state.size}")
     String state;
-    @NullableNotBlank(message = "Country should either be null or not blank")
-    @Size(min = 5, max = 20, message = "Country must be between 5 and 20 characters long")
+    @NullableNotBlank(message = "{error.nullable.blank.zip}")
+    @Pattern(regexp = "^\\d{6}$", message = "{error.invalid.zip.pattern}")
     String zip;
-    @NullableNotBlank(message = "Description should either be null or not blank")
-    @Size(min = 5, max = 20, message = "Description must be between 5 and 20 characters long")
+    @NullableNotBlank(message = "{error.nullable.blank.description}")
+    @Size(min = 5, max = 200, message = "{error.hotel.description.size}")
     String description;
-    @Max(value = 5, message = "Rating must be less than or equal to 5")
-    @PositiveOrZero(message = "Rating must be greater than or equal to 0")
+    @Max(value = 5, message = "{error.hotel.rating}")
+    @PositiveOrZero(message = "{error.hotel.rating}")
     @Nullable
     Double rating;
     @Nullable

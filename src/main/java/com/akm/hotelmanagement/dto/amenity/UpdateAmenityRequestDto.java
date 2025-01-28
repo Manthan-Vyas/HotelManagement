@@ -12,10 +12,10 @@ import java.io.Serializable;
  */
 @Value
 public class UpdateAmenityRequestDto implements Serializable {
-    @NullableNotBlank(message = "Name should either be null or not blank")
-    @Size(message = "Name must be between 5 and 20 characters long", min = 2, max = 20)
+    @NullableNotBlank(message = "{error.nullable.blank.name}")
+    @Size(message = "{error.amenity.name.size}", min = 2, max = 20)
     String name;
-    @NullableNotBlank(message = "Description should either be null or not blank")
-    @Size(message = "Description must be between 5 and 50 characters long", min = 5, max = 50)
+    @NullableNotBlank(message = "{error.nullable.blank.description}")
+    @Size(message = "{error.amenity.description.size}", min = 5, max = 50)
     String description;
 }

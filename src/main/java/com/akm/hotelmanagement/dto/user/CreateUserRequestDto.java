@@ -3,6 +3,7 @@ package com.akm.hotelmanagement.dto.user;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Value;
 
 import java.io.Serializable;
@@ -12,20 +13,22 @@ import java.io.Serializable;
  */
 @Value
 public class CreateUserRequestDto implements Serializable {
-    @NotBlank(message = "Name is mandatory")
+    @NotBlank(message = "{error.required.name}")
+    @Size(min = 2, max = 50, message = "{error.user.name.size}")
     String name;
-    @NotBlank(message = "Email is mandatory")
-    @Email(regexp = ".*@.*\\..*", message = "Invalid email address")
+    @NotBlank(message = "{error.required.email}")
+    @Email(regexp = ".*@.*\\..*", message = "{error.invalid.email}")
     String email;
-    @NotBlank(message = "Username is mandatory")
+    @NotBlank(message = "{error.required.username}")
+    @Size(min = 3, max = 20, message = "{error.user.username.size}")
     String username;
-    @NotBlank(message = "Password is mandatory")
+    @NotBlank(message = "{error.required.password}")
     @Pattern(
             regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",
-            message = "Password must be at least 8 characters long, contain at least one digit, one lowercase letter, one uppercase letter, and one special character"
+            message = "{error.invalid.password.pattern}"
     )
     String password;
-    @NotBlank(message = "Phone is mandatory")
-    @Pattern(regexp = "^\\d{10}$", message = "Phone number must be a 10-digit number")
+    @NotBlank(message = "{error.required.phone}")
+    @Pattern(regexp = "^\\d{10}$", message = "{error.invalid.phone.pattern}")
     String phone;
 }

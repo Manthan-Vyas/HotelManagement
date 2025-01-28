@@ -14,17 +14,17 @@ import java.util.Set;
  */
 @Value
 public class CreateHotelRoomRequestDto implements Serializable {
-    @Positive(message = "Room number must be a positive integer")
+    @Positive(message = "{error.room.number.positive}")
     int number;
-    @Size(message = "Room type must be between 1 and 255 characters long", min = 1, max = 255)
-    @NotBlank(message = "Room type is mandatory")
+    @Size(message = "{error.room.type.size}", min = 1, max = 50)
+    @NotBlank(message = "{error.room.type.required}")
     String type;
-    @Size(message = "Room description must be between 5 and 255 characters long", min = 5, max = 255)
-    @NotBlank(message = "Room description is mandatory")
+    @Size(message = "{error.room.description.size}", min = 5, max = 200)
+    @NotBlank(message = "{error.required.description}")
     String description;
-    @Positive(message = "Number of beds must be a positive integer")
-    int numberOfBeds;
-    @Positive(message = "Price of the room per night must be a positive integer")
+    @Positive(message = "{error.room.capacity.positive}")
+    int capacity;
+    @Positive(message = "{error.room.price.positive}")
     double pricePerNight;
     Set<String> imageUrls;
 }

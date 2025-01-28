@@ -16,19 +16,19 @@ import java.util.Set;
  */
 @Value
 public class UpdateHotelRoomRequestDto implements Serializable {
-    @Positive(message = "Room number must be a positive integer")
+    @Positive(message = "{error.room.number.positive}")
     @Nullable
     Integer number;
-    @Size(message = "Room type must be between 1 and 255 characters long", min = 1, max = 255)
-    @NullableNotBlank(message = "Room should either be null or not blank")
+    @Size(message = "{error.room.type.size}", min = 1, max = 50)
+    @NullableNotBlank(message = "{error.room.type.nullable.blank}")
     String type;
-    @Size(message = "Room description must be between 5 and 255 characters long", min = 5, max = 255)
-    @NullableNotBlank(message = "Room description is mandatory")
+    @Size(message = "{error.room.description.size}", min = 5, max = 200)
+    @NullableNotBlank(message = "{error.nullable.blank.description.}")
     String description;
-    @Positive(message = "Number of beds must be a positive integer")
+    @Positive(message = "{error.room.capacity.positive}")
     @Nullable
-    Integer numberOfBeds;
-    @Positive(message = "Price of the room per night must be a positive integer")
+    Integer capacity;
+    @Positive(message = "{error.room.price.positive}")
     @Nullable
     Double pricePerNight;
     @Nullable

@@ -29,8 +29,8 @@ public class Room {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "number_of_beds", nullable = false)
-    private int numberOfBeds;
+    @Column(name = "capacity", nullable = false)
+    private int capacity;
 
     @Column(name = "price_per_night", nullable = false)
     private double pricePerNight;

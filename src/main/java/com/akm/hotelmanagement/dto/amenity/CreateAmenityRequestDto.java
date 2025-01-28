@@ -11,10 +11,10 @@ import java.io.Serializable;
  */
 @Value
 public class CreateAmenityRequestDto implements Serializable {
-    @NotBlank(message = "Name is mandatory")
-    @Size(message = "Name must be between 2 and 20 characters long", min = 2, max = 20)
+    @NotBlank(message = "{error.required.name}")
+    @Size(message = "{error.amenity.name.size}", min = 2, max = 20)
     String name;
-    @NotBlank(message = "Description is mandatory")
-    @Size(message = "Description must be between 5 and 50 characters long", min = 5, max = 50)
+    @NotBlank(message = "{error.required.description}")
+    @Size(message = "{error.amenity.description.size}", min = 5, max = 50)
     String description;
 }
