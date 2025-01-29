@@ -2,6 +2,7 @@ package com.akm.hotelmanagement.filter;
 
 import com.akm.hotelmanagement.entity.Amenity;
 import com.akm.hotelmanagement.entity.Hotel;
+import com.akm.hotelmanagement.entity.Room;
 import com.akm.hotelmanagement.repository.AmenityRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -103,6 +104,27 @@ class AmenitySpecificationsTest {
         entityManager.flush();
 
         Specification<Amenity> spec = AmenitySpecifications.hasFilter("hotel-name", "ABC");
+        assertThat(amenityRepository.findAll(spec)).containsExactly(amenity1);
+    }
+
+    @Test
+    void testHasFilterByRoomId() {
+        Amenity amenity1 = validAmenity();
+        entityManager.persist(amenity1);
+        Amenity amenity2 = randomValidAmenity();
+        entityManager.persist(amenity2);
+
+        Hotel hotel = validHotel();
+        hotel.setAmenities(new HashSet<>(List.of(amenity1)));
+        entityManager.persist(hotel);
+
+        Room room = validRoom();
+        room.setHotel(hotel);
+        entityManager.persist(room);
+
+        entityManager.flush();
+
+        Specification<Amenity> spec = AmenitySpecifications.hasFilter("room-id", room.getId().toString());
         assertThat(amenityRepository.findAll(spec)).containsExactly(amenity1);
     }
 }

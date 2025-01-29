@@ -14,7 +14,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 
 import static com.akm.hotelmanagement.util.TestUtils.*;
@@ -74,9 +73,9 @@ public class ReservationSpecificationsTest {
     }
 
     @Test
-    void testHasFilterByGuestName() {
+    void testHasFilterByGuestUsername() {
         User user = validUser();
-        user.setName("John Doe");
+        user.setUsername("JohnDoe");
         entityManager.persist(user);
 
         Reservation reservation1 = validReservation();
@@ -87,7 +86,7 @@ public class ReservationSpecificationsTest {
 
         entityManager.flush();
 
-        Specification<Reservation> spec = ReservationSpecifications.hasFilter("user-name", "John Doe");
+        Specification<Reservation> spec = ReservationSpecifications.hasFilter("username", "JohnDoe");
         assertThat(reservationRepository.findAll(spec)).containsExactly(reservation1);
     }
 

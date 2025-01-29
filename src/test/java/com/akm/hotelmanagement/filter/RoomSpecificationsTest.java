@@ -3,6 +3,7 @@ package com.akm.hotelmanagement.filter;
 import com.akm.hotelmanagement.entity.Hotel;
 import com.akm.hotelmanagement.entity.Reservation;
 import com.akm.hotelmanagement.entity.Room;
+import com.akm.hotelmanagement.entity.User;
 import com.akm.hotelmanagement.repository.RoomRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -169,5 +170,38 @@ public class RoomSpecificationsTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst()).isEqualTo(room2);
+    }
+
+    @Test
+    public void testHasFilterByUsername() {
+        Room room1 = validRoom();
+        entityManager.persist(room1);
+        Room room2 = randomValidRoom();
+        entityManager.persist(room2);
+
+        User user = validUser();
+        user.setUsername("user1");
+        entityManager.persist(user);
+
+        Reservation reservation1 = validReservation();
+        reservation1.setRoom(room1);
+        reservation1.setUser(user);
+        entityManager.persist(reservation1);
+
+        Reservation reservation2 = randomValidReservation();
+        reservation2.setRoom(room2);
+        reservation2.setUser(user);
+        entityManager.persist(reservation2);
+
+        entityManager.flush();
+
+        Specification<Room> spec = RoomSpecification.hasFilter(
+                "username", user.getUsername()
+        );
+        List<Room> result = roomRepository.findAll(spec);
+
+        assertThat(result).hasSize(2);
+        assertThat(result.getFirst().getId()).isEqualTo(room1.getId());
+        assertThat(result.getLast().getId()).isEqualTo(room2.getId());
     }
 }
