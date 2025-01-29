@@ -40,4 +40,20 @@ public class UpdateHotelRequestDto implements Serializable {
     Double rating;
     @Nullable
     Set<String> imageUrls;
+
+    public boolean hasAllFieldsNull() {
+        return this.getName() == null && this.getAddress() == null && this.getCity() == null && this.getState() == null && this.getZip() == null && this.getDescription() == null && this.getRating() == null && this.getImageUrls() == null;
+    }
+
+    public boolean hasAllFieldsNotNull() {
+        return this.getName() != null && this.getAddress() != null && this.getCity() != null && this.getState() != null && this.getZip() != null && this.getDescription() != null && this.getRating() != null && this.getImageUrls() != null;
+    }
+
+    public boolean hasAnyFieldNotNull() {
+        return this.getName() != null || this.getAddress() != null || this.getCity() != null || this.getState() != null || this.getZip() != null || this.getDescription() != null || this.getRating() != null || this.getImageUrls() != null;
+    }
+
+    public boolean hasAnyFieldNull() {
+        return this.getName() == null || this.getAddress() == null || this.getCity() == null || this.getState() == null || this.getZip() == null || this.getDescription() == null || this.getRating() == null || this.getImageUrls() == null;
+    }
 }

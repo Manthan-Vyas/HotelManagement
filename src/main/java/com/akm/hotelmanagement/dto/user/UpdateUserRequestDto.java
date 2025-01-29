@@ -31,4 +31,20 @@ public class UpdateUserRequestDto implements Serializable {
     @NullableNotBlank(message = "{error.nullable.blank.phone}")
     @Pattern(regexp = "^\\d{10}$", message = "{error.invalid.phone.pattern}")
     String phone;
+
+    public boolean hasAllFieldsNull() {
+        return this.getName() == null && this.getUsername() == null && this.getEmail() == null && this.getPassword() == null && this.getPhone() == null;
+    }
+
+    public boolean hasAllFieldsNotNull() {
+        return this.getName() != null && this.getEmail() != null && this.getPassword() != null && this.getPhone() != null;
+    }
+
+    public boolean hasAnyFieldNotNull() {
+        return this.getName() != null || this.getEmail() != null || this.getPassword() != null || this.getPhone() != null;
+    }
+
+    public boolean hasAnyFieldNull() {
+        return this.getName() == null || this.getEmail() == null || this.getPassword() == null || this.getPhone() == null;
+    }
 }

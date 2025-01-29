@@ -34,4 +34,20 @@ public class UpdateHotelRoomRequestDto implements Serializable {
     @Nullable
     RoomStatus roomStatus; // todo: check if this is validated as proper RoomStatus
     Set<String> imageUrls;
+
+    public boolean hasAllFieldsNull() {
+        return this.getNumber() == null && this.getType() == null && this.getDescription() == null && this.getCapacity() == null && this.getPricePerNight() == null && this.getRoomStatus() == null && this.getImageUrls() == null;
+    }
+
+    public boolean hasAnyFieldNotNull() {
+        return this.getNumber() != null || this.getType() != null || this.getDescription() != null || this.getCapacity() != null || this.getPricePerNight() != null || this.getRoomStatus() != null || this.getImageUrls() != null;
+    }
+
+    public boolean hasAnyFieldNull() {
+        return this.getNumber() == null || this.getType() == null || this.getDescription() == null || this.getCapacity() == null || this.getPricePerNight() == null || this.getRoomStatus() == null || this.getImageUrls() == null;
+    }
+
+    public boolean hasAllFieldsNotNull() {
+        return this.getNumber() != null && this.getType() != null && this.getDescription() != null && this.getCapacity() != null && this.getPricePerNight() != null && this.getRoomStatus() != null && this.getImageUrls() != null;
+    }
 }

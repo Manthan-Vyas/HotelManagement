@@ -18,4 +18,20 @@ public class UpdateAmenityRequestDto implements Serializable {
     @NullableNotBlank(message = "{error.nullable.blank.description}")
     @Size(message = "{error.amenity.description.size}", min = 5, max = 50)
     String description;
+
+    public boolean hasAllFieldsNull() {
+        return this.getName() == null && this.getDescription() == null;
+    }
+
+    public boolean hasAllFieldsNotNull() {
+        return this.getName() != null && this.getDescription() != null;
+    }
+
+    public boolean hasAnyFieldNull() {
+        return this.getName() == null || this.getDescription() == null;
+    }
+
+    public boolean hasAnyFieldNotNull() {
+        return this.getName() != null || this.getDescription() != null;
+    }
 }
