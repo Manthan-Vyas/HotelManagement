@@ -9,7 +9,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 
 public class RoomSpecification {
     public static Specification<Room> hasFilter(String filterBy, String filterValue) {
@@ -19,12 +18,14 @@ public class RoomSpecification {
             }
             return switch (filterBy.toLowerCase()) {
                 case "type" -> criteriaBuilder.equal(root.get("type"), filterValue);
-                case "status" -> criteriaBuilder.equal(root.get("status"), filterValue);
+                case "number" -> criteriaBuilder.equal(root.get("number"), Integer.parseInt(filterValue));
+                case "status" -> criteriaBuilder.equal(root.get("status"), RoomStatus.valueOf(filterValue));
                 case "capacity" -> criteriaBuilder.equal(root.get("capacity"), Integer.parseInt(filterValue));
                 case "price" -> criteriaBuilder.equal(root.get("pricePerNight"), Double.parseDouble(filterValue));
                 case "hotel-id" -> criteriaBuilder.equal(root.get("hotel").get("id"), Long.parseLong(filterValue));
                 case "hotel-name" -> criteriaBuilder.equal(root.get("hotel").get("name"), filterValue);
                 case "reservation-id" -> criteriaBuilder.equal(root.join("reservations").get("id"), Long.parseLong(filterValue));
+                case "username" -> criteriaBuilder.equal(root.join("reservations").get("user").get("username"), filterValue);
                 default -> throw new IllegalArgumentException("Invalid filterBy field: " + filterBy);
             };
         };

@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface HotelRepository extends
         JpaRepository<Hotel, Long>,
         JpaSpecificationExecutor<Hotel> {
+    boolean existsByName(String name);
 }

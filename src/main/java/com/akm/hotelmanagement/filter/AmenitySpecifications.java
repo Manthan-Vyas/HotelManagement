@@ -16,6 +16,9 @@ public class AmenitySpecifications {
                 case "id" -> criteriaBuilder.equal(root.get("id"), filterValue);
                 case "hotel-name" -> criteriaBuilder.like(root.join("hotels").get("name"), "%" + filterValue + "%");
                 case "hotel-id" -> criteriaBuilder.equal(root.join("hotels").get("id"), filterValue);
+                // if roomId is provided we can get the hotelId from the room and then amenities of that hotel
+                case "room-id" -> criteriaBuilder.equal(root.join("hotels").join("rooms").get("id"), filterValue);
+
                 default -> throw new IllegalArgumentException("Invalid filter field: " + filterBy);
             };
         };

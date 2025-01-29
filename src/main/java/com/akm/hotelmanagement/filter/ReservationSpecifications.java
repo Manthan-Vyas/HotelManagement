@@ -1,6 +1,7 @@
 package com.akm.hotelmanagement.filter;
 
 import com.akm.hotelmanagement.entity.Reservation;
+import com.akm.hotelmanagement.entity.util.ReservationStatus;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
@@ -17,12 +18,12 @@ public class ReservationSpecifications {
                 case "id" -> criteriaBuilder.equal(root.get("id"), filterValue);
                 case "room-id" -> criteriaBuilder.equal(root.get("room").get("id"), filterValue);
                 case "user-id" -> criteriaBuilder.equal(root.get("user").get("id"), UUID.fromString(filterValue));
-                case "user-name" -> criteriaBuilder.like(criteriaBuilder.lower(root.get("user").get("name")), "%" + filterValue.toLowerCase() + "%");
+                case "username" -> criteriaBuilder.like(criteriaBuilder.lower(root.get("user").get("username")), "%" + filterValue.toLowerCase() + "%");
                 case "check-in" -> criteriaBuilder.equal(root.get("checkIn"), LocalDate.parse(filterValue));
                 case "check-out" -> criteriaBuilder.equal(root.get("checkOut"), LocalDate.parse(filterValue));
                 case "reservation-date" -> criteriaBuilder.equal(root.get("reservationDate"), LocalDate.parse(filterValue));
                 case "total-guests" -> criteriaBuilder.equal(root.get("totalGuests"), Integer.parseInt(filterValue));
-                case "status" -> criteriaBuilder.equal(root.get("status"), filterValue);
+                case "status" -> criteriaBuilder.equal(root.get("status"), ReservationStatus.valueOf(filterValue));
                 default -> throw new IllegalArgumentException("Invalid filter field: " + filterBy);
             };
         };
