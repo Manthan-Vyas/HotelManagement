@@ -21,6 +21,15 @@ public class ResponseWrapper<T> { // todo: make this extend from ResponseEntity<
     private ErrorDetails error;
     private Meta meta;
 
+    public ResponseWrapper(boolean status, int code, String message, T data, ErrorDetails error, Meta meta) {
+        this.status = status;
+        this.code = code;
+        this.message = message;
+        this.data = data;
+        this.error = error;
+        this.meta = meta;
+    }
+
     public ResponseWrapper(boolean status, int code, String message, T data, ErrorDetails error, HttpServletRequest request) {
         this.status = status;
         this.code = code;
