@@ -4,7 +4,10 @@ import com.akm.hotelmanagement.dto.user.CreateUserRequestDto;
 import com.akm.hotelmanagement.dto.user.UpdateUserRequestDto;
 import com.akm.hotelmanagement.dto.user.UserResponseDto;
 import com.akm.hotelmanagement.entity.User;
+import com.akm.hotelmanagement.repository.ReservationRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.HashSet;
 import java.util.UUID;
@@ -12,6 +15,13 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserMapperTest {
+
+    private UserMapper userMapper;
+
+    @BeforeEach
+    void setUp() {
+        userMapper = new UserMapper(Mockito.mock(ReservationRepository.class));
+    }
 
     @Test
     void testToCreateDto() {
@@ -22,7 +32,7 @@ public class UserMapperTest {
         user.setPassword("password123");
         user.setPhone("1234567890");
 
-        CreateUserRequestDto dto = UserMapper.toCreateDto(user);
+        CreateUserRequestDto dto = userMapper.toCreateDto(user);
 
         assertEquals(user.getName(), dto.getName());
         assertEquals(user.getEmail(), dto.getEmail());
@@ -40,7 +50,7 @@ public class UserMapperTest {
         user.setPassword("password123");
         user.setPhone("1234567890");
 
-        UpdateUserRequestDto dto = UserMapper.toUpdateDto(user);
+        UpdateUserRequestDto dto = userMapper.toUpdateDto(user);
 
         assertEquals(user.getName(), dto.getName());
         assertEquals(user.getEmail(), dto.getEmail());
@@ -59,14 +69,14 @@ public class UserMapperTest {
         user.setPhone("1234567890");
         user.setReservations(new HashSet<>());
 
-        UserResponseDto dto = UserMapper.toResponseDto(user);
+        UserResponseDto dto = userMapper.toResponseDto(user);
 
         assertEquals(user.getId(), dto.getId());
         assertEquals(user.getName(), dto.getName());
         assertEquals(user.getEmail(), dto.getEmail());
         assertEquals(user.getUsername(), dto.getUsername());
         assertEquals(user.getPhone(), dto.getPhone());
-        assertEquals(user.getReservations().size(), dto.getReservations().size());
+        assertEquals(user.getReservations().size(), dto.getReservationIds().size());
     }
 
     @Test
@@ -79,7 +89,7 @@ public class UserMapperTest {
                 "1234567890"
         );
 
-        User user = UserMapper.toEntity(dto);
+        User user = userMapper.toEntity(dto);
 
         assertEquals(dto.getName(), user.getName());
         assertEquals(dto.getEmail(), user.getEmail());
@@ -105,7 +115,7 @@ public class UserMapperTest {
         user.setPassword("oldpassword");
         user.setPhone("0987654321");
 
-        User updatedUser = UserMapper.toEntity(dto, user);
+        User updatedUser = userMapper.toEntity(dto, user);
 
         assertEquals(dto.getName(), updatedUser.getName());
         assertEquals(dto.getEmail(), updatedUser.getEmail());
@@ -125,13 +135,13 @@ public class UserMapperTest {
                 new HashSet<>()
         );
 
-        User user = UserMapper.toEntity(dto);
+        User user = userMapper.toEntity(dto);
 
         assertEquals(dto.getId(), user.getId());
         assertEquals(dto.getName(), user.getName());
         assertEquals(dto.getEmail(), user.getEmail());
         assertEquals(dto.getUsername(), user.getUsername());
         assertEquals(dto.getPhone(), user.getPhone());
-        assertEquals(dto.getReservations().size(), user.getReservations().size());
+        assertEquals(dto.getReservationIds().size(), user.getReservations().size());
     }
 }

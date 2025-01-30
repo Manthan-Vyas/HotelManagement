@@ -1,19 +1,34 @@
 package com.akm.hotelmanagement.mapper;
 
-import com.akm.hotelmanagement.dto.hotel.HotelResponseDto;
 import com.akm.hotelmanagement.dto.room.CreateHotelRoomRequestDto;
 import com.akm.hotelmanagement.dto.room.RoomResponseDto;
 import com.akm.hotelmanagement.dto.room.UpdateHotelRoomRequestDto;
 import com.akm.hotelmanagement.entity.Hotel;
 import com.akm.hotelmanagement.entity.Room;
 import com.akm.hotelmanagement.entity.util.RoomStatus;
+import com.akm.hotelmanagement.repository.HotelRepository;
+import com.akm.hotelmanagement.repository.ReservationRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.HashSet;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 public class RoomMapperTest {
+
+    private RoomMapper roomMapper;
+    private HotelRepository hotelRepository;
+
+    @BeforeEach
+    void setUp() {
+        hotelRepository = Mockito.mock(HotelRepository.class);
+        roomMapper = new RoomMapper(hotelRepository, Mockito.mock(ReservationRepository.class));
+    }
 
     @Test
     void testToCreateDto() {
@@ -25,7 +40,7 @@ public class RoomMapperTest {
         room.setPricePerNight(150.0);
         room.setImageUrls(new HashSet<>());
 
-        CreateHotelRoomRequestDto dto = RoomMapper.toCreateDto(room);
+        CreateHotelRoomRequestDto dto = roomMapper.toCreateDto(room);
 
         assertEquals(room.getNumber(), dto.getNumber());
         assertEquals(room.getType(), dto.getType());
@@ -46,7 +61,7 @@ public class RoomMapperTest {
         room.setStatus(RoomStatus.AVAILABLE);
         room.setImageUrls(new HashSet<>());
 
-        UpdateHotelRoomRequestDto dto = RoomMapper.toUpdateDto(room);
+        UpdateHotelRoomRequestDto dto = roomMapper.toUpdateDto(room);
 
         assertEquals(room.getNumber(), dto.getNumber());
         assertEquals(room.getType(), dto.getType());
@@ -71,7 +86,7 @@ public class RoomMapperTest {
         room.setHotel(new Hotel());
         room.setReservations(new HashSet<>());
 
-        RoomResponseDto dto = RoomMapper.toResponseDto(room);
+        RoomResponseDto dto = roomMapper.toResponseDto(room);
 
         assertEquals(room.getId(), dto.getId());
         assertEquals(room.getNumber(), dto.getNumber());
@@ -81,8 +96,8 @@ public class RoomMapperTest {
         assertEquals(room.getPricePerNight(), dto.getPricePerNight());
         assertEquals(room.getStatus(), dto.getStatus());
         assertEquals(room.getImageUrls(), dto.getImageUrls());
-        assertEquals(room.getHotel().getId(), dto.getHotel().getId());
-        assertEquals(room.getReservations().size(), dto.getReservations().size());
+        assertEquals(room.getHotel().getId(), dto.getHotelId());
+        assertEquals(room.getReservations().size(), dto.getReservationIds().size());
     }
 
     @Test
@@ -96,7 +111,7 @@ public class RoomMapperTest {
                 new HashSet<>()
         );
 
-        Room room = RoomMapper.toEntity(dto);
+        Room room = roomMapper.toEntity(dto);
 
         assertEquals(dto.getNumber(), room.getNumber());
         assertEquals(dto.getType(), room.getType());
@@ -127,7 +142,7 @@ public class RoomMapperTest {
         room.setStatus(RoomStatus.OCCUPIED);
         room.setImageUrls(new HashSet<>());
 
-        Room updatedRoom = RoomMapper.toEntity(dto, room);
+        Room updatedRoom = roomMapper.toEntity(dto, room);
 
         assertEquals(dto.getNumber(), updatedRoom.getNumber());
         assertEquals(dto.getType(), updatedRoom.getType());
@@ -140,6 +155,10 @@ public class RoomMapperTest {
 
     @Test
     void testToEntityFromResponseDto() {
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        when(hotelRepository.save(any(Hotel.class))).thenReturn(hotel);
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
         RoomResponseDto dto = new RoomResponseDto(
                 1L,
                 101,
@@ -149,23 +168,11 @@ public class RoomMapperTest {
                 150.0,
                 RoomStatus.AVAILABLE,
                 new HashSet<>(),
-                new HotelResponseDto(
-                        1L,
-                        "Hotel",
-                        "City",
-                        "Country",
-                        "Address",
-                        "Phone",
-                        "Email",
-                        4.0,
-                        new HashSet<>(),
-                        new HashSet<>(),
-                        new HashSet<>()
-                ),
+                1L,
                 new HashSet<>()
         );
 
-        Room room = RoomMapper.toEntity(dto);
+        Room room = roomMapper.toEntity(dto);
 
         assertEquals(dto.getId(), room.getId());
         assertEquals(dto.getNumber(), room.getNumber());
@@ -175,7 +182,7 @@ public class RoomMapperTest {
         assertEquals(dto.getPricePerNight(), room.getPricePerNight());
         assertEquals(dto.getStatus(), room.getStatus());
         assertEquals(dto.getImageUrls(), room.getImageUrls());
-        assertEquals(dto.getHotel().getId(), room.getHotel().getId());
-        assertEquals(dto.getReservations().size(), room.getReservations().size());
+        assertEquals(dto.getHotelId(), room.getHotel().getId());
+        assertEquals(dto.getReservationIds().size(), room.getReservations().size());
     }
 }
