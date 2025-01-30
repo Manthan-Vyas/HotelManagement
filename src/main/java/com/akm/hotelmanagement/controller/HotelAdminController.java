@@ -47,9 +47,10 @@ public class HotelAdminController {
 
     @GetMapping
     @Operation(summary = "Hotel admin home", description = "Get the home page for hotel admin")
-    public ResponseEntity<ResponseWrapper<Void>> getHotelAdminHome() {
+    public ResponseEntity<ResponseWrapper<String>> getHotelAdminHome() {
         return ResponseEntity.ok(
-                ResponseWrapper.getNoContentResponseWrapper(
+                ResponseWrapper.getOkResponseWrapper(
+                        "Welcome to the hotel admin home page",
                         null
                 )
         );
@@ -63,7 +64,7 @@ public class HotelAdminController {
             @Nullable HttpServletRequest request
     ) {
         if (roomService.getRoomByHotelIdAndRoomNumber(hotelId, dto.getNumber()) != null) {
-            throw new ResourceAlreadyExistsException("Hotel already exists with id: " + hotelId);
+            throw new ResourceAlreadyExistsException("Room " + dto.getNumber() + " already exists in hotel with id: " + hotelId);
         }
         RoomModel roomModel = roomModelAssembler.toModel(
                 roomService.createRoom(dto, hotelId)

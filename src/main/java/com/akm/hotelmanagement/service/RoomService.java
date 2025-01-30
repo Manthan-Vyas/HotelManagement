@@ -15,6 +15,7 @@ import com.akm.hotelmanagement.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
@@ -58,10 +59,16 @@ public class RoomService {
     public RoomResponseDto getRoomByHotelIdAndRoomNumber(Long hotelId, int roomNumber) {
         return roomRepository.findAll(
                         where(
-                                RoomSpecification.hasFilter("hotel-id", hotelId.toString())
-                        ).and(RoomSpecification.hasFilter("number", String.valueOf(roomNumber))
+                                (root, query, criteriaBuilder) -> {
+                                    assert query != null;
+                                    query.distinct(true);
+                                    return criteriaBuilder.and(
+                                            criteriaBuilder.equal(root.get("hotel").get("id"), hotelId),
+                                            criteriaBuilder.equal(root.get("number"), roomNumber)
+                                    );
+                                }
                         ), Pageable.unpaged())
-                .map(roomMapper::toResponseDto).stream().findFirst().orElseThrow(() -> new ResourceNotFoundException("Room not found with hotel id: " + hotelId + " and room number: " + roomNumber));
+                .map(roomMapper::toResponseDto).stream().findFirst().orElse(null);
     }
 
     public Page<RoomResponseDto> getAllRooms(Pageable pageable, String filterBy, String filterValue) {

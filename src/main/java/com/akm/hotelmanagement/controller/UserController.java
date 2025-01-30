@@ -50,9 +50,10 @@ public class UserController {
 
     @GetMapping
     @Operation(summary = "User home", description = "Get the home page of a user")
-    public ResponseEntity<ResponseWrapper<Void>> getUserHome() {
+    public ResponseEntity<ResponseWrapper<String>> getUserHome() {
         return ResponseEntity.ok(
-                ResponseWrapper.getNoContentResponseWrapper(
+                ResponseWrapper.getOkResponseWrapper(
+                        "Welcome to the user home page",
                         null
                 )
         );

@@ -64,13 +64,13 @@ public class SecurityConfig {
                                         (request, response, authentication) -> {
                                             switch (authentication.getAuthorities().toString()) {
                                                 case "[ROLE_ADMIN]":
-                                                    response.sendRedirect("/admin/users");
+                                                    response.sendRedirect("/admin");
                                                     break;
                                                 case "[ROLE_USER]":
                                                     response.sendRedirect("/users/" + authentication.getName());
                                                     break;
                                                 case "[ROLE_HOTEL_ADMIN]":
-                                                    response.sendRedirect("/hotel-admin/hotels");
+                                                    response.sendRedirect("/hotel-admin");
                                                     break;
                                                 default:
                                                     response.sendRedirect("/login");

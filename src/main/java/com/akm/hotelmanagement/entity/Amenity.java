@@ -25,7 +25,7 @@ public class Amenity {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @ManyToMany(mappedBy = "amenities", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "amenities", fetch = FetchType.EAGER)
     private Set<Hotel> hotels = new LinkedHashSet<>();
 
     @Override

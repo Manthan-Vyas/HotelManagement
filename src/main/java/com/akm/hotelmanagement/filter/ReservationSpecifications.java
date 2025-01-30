@@ -15,8 +15,8 @@ public class ReservationSpecifications {
                 return null;
             }
             return switch (filterBy.toLowerCase()) {
-                case "id" -> criteriaBuilder.equal(root.get("id"), filterValue);
-                case "room-id" -> criteriaBuilder.equal(root.get("room").get("id"), filterValue);
+                case "id" -> criteriaBuilder.equal(root.get("id"), Long.parseLong(filterValue));
+                case "room-id" -> criteriaBuilder.equal(root.get("room").get("id"), Long.parseLong(filterValue));
                 case "user-id" -> criteriaBuilder.equal(root.get("user").get("id"), UUID.fromString(filterValue));
                 case "username" -> criteriaBuilder.like(criteriaBuilder.lower(root.get("user").get("username")), "%" + filterValue.toLowerCase() + "%");
                 case "check-in" -> criteriaBuilder.equal(root.get("checkIn"), LocalDate.parse(filterValue));
@@ -30,8 +30,6 @@ public class ReservationSpecifications {
     }
 
     public static Specification<Reservation> reservationDateBetween(LocalDate startDate, LocalDate endDate) {
-        return (root, query, criteriaBuilder) -> {
-            return criteriaBuilder.between(root.get("reservationDate"), startDate, endDate);
-        };
+        return (root, query, criteriaBuilder) -> criteriaBuilder.between(root.get("reservationDate"), startDate, endDate);
     }
 }

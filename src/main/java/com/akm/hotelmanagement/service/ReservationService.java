@@ -97,10 +97,15 @@ public class ReservationService {
                     .map(reservationMapper::toResponseDto);
         }
         return reservationRepository.findAll(
-                where(ReservationSpecifications.hasFilter("room-id", id.toString()))
-                .and(where(ReservationSpecifications.hasFilter(
-                        filterBy, filterValue
-                ))),
+                where(
+                        ReservationSpecifications.hasFilter(
+                                        "room-id", id.toString()
+                        ).and(
+                                ReservationSpecifications.hasFilter(
+                                        filterBy, filterValue
+                                )
+                        )
+                ),
                 pageable
         ).map(reservationMapper::toResponseDto);
     }

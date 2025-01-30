@@ -48,9 +48,10 @@ public class AdminController {
 
     @GetMapping
     @Operation(summary = "Admin home", description = "Get the admin home page")
-    public ResponseEntity<ResponseWrapper<Void>> getAdminHome() {
+    public ResponseEntity<ResponseWrapper<String>> getAdminHome() {
         return ResponseEntity.ok(
-                ResponseWrapper.getNoContentResponseWrapper(
+                ResponseWrapper.getOkResponseWrapper(
+                        "Welcome to the admin home page",
                         null
                 )
         );
