@@ -22,8 +22,6 @@ public class ReservationModel extends RepresentationModel<ReservationModel> {
     private double totalPrice;
     private LocalDate reservationDate;
     private ReservationStatus status;
-    private UserModel user;
-    private RoomModel room;
 
     public ReservationModel(ReservationResponseDto dto) {
         this(
@@ -33,9 +31,7 @@ public class ReservationModel extends RepresentationModel<ReservationModel> {
                 dto.getNumberOfGuests(),
                 dto.getTotalPrice(),
                 dto.getReservationDate(),
-                dto.getStatus(),
-                new UserModel(dto.getUser()),
-                new RoomModel(dto.getRoom())
+                dto.getStatus()
         );
     }
 }
