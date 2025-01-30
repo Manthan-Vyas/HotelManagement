@@ -53,7 +53,7 @@ public class SecurityConfig {
                                         "/hotels/**"
                                 ).permitAll()
                                 .requestMatchers("/admin/**").hasRole(UserRole.ADMIN.name())
-                                .requestMatchers("/hotel-admin/**").hasRole(UserRole.ADMIN.name())
+                                .requestMatchers("/hotel-admin/**").hasRole(UserRole.HOTEL_ADMIN.name())
                                 .requestMatchers("/users/**").hasRole(UserRole.USER.name())
                                 .anyRequest().authenticated()
                 )

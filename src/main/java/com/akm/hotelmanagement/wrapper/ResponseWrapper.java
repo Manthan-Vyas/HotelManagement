@@ -110,11 +110,12 @@ public class ResponseWrapper<T> { // todo: make this extend from ResponseEntity<
         );
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> ResponseWrapper<T> getNoContentResponseWrapper(HttpServletRequest request) {
         return getSuccessResponseWrapper(
                 HttpStatus.NO_CONTENT.value(),
                 HttpStatus.NO_CONTENT.getReasonPhrase(),
-                null,
+                (T) emptyJson,
                 request
         );
     }
