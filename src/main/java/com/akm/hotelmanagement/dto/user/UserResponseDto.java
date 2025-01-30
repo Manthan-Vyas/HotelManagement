@@ -1,7 +1,6 @@
 package com.akm.hotelmanagement.dto.user;
 
-import com.akm.hotelmanagement.dto.reservation.ReservationResponseDto;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import lombok.Value;
 
 import java.io.Serializable;
@@ -12,12 +11,12 @@ import java.util.UUID;
  * DTO for {@link com.akm.hotelmanagement.entity.User}
  */
 @Value
+@JsonIdentityInfo(generator = com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class UserResponseDto implements Serializable {
     UUID id;
     String name;
     String email;
     String username;
     String phone;
-    @JsonManagedReference
-    Set<ReservationResponseDto> reservations;
+    Set<Long> reservationIds;
 }
