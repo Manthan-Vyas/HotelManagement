@@ -2,9 +2,10 @@ package com.akm.hotelmanagement.config.security;
 
 import com.akm.hotelmanagement.entity.util.UserRole;
 import com.akm.hotelmanagement.service.UserService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -17,10 +18,14 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final UserService userService;
+
+    @Autowired
+    public SecurityConfig(@Lazy UserService userService) {
+        this.userService = userService;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -55,9 +60,7 @@ public class SecurityConfig {
                 .formLogin(formLogin ->
                         formLogin
                                 .loginProcessingUrl("/login")
-                                .successHandler((request, response, authentication) -> {
-                                    response.sendRedirect("/users/" + authentication.getName());
-                                })
+                                .successHandler((request, response, authentication) -> response.sendRedirect("/users/" + authentication.getName()))
                                 .failureForwardUrl("/login?error=true")
                 )
                 .logout(logout ->
@@ -73,7 +76,7 @@ public class SecurityConfig {
                                 .sessionFixation().migrateSession()
                                 .maximumSessions(1)
                                 .maxSessionsPreventsLogin(false)
-                )
+                ).userDetailsService(userService)
         ;
         return httpSecurity.build();
     }

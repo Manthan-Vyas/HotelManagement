@@ -21,8 +21,8 @@ public class UserModelAssembler extends RepresentationModelAssemblerSupport<User
     public @NonNull UserModel toModel(@NonNull UserResponseDto user) {
         UserModel userModel = new UserModel(user);
         userModel.add(
-                linkTo(methodOn(UserController.class).getUserDetails(user.getId().toString())).withSelfRel(),
-                linkTo(methodOn(UserController.class).getUserReservations(user.getUsername())).withRel("reservations")
+                linkTo(methodOn(UserController.class).getUserDetails(user.getUsername(), null)).withSelfRel(),
+                linkTo(methodOn(UserController.class).getUserReservations(user.getUsername(), 0, 10, "reservationDate", "asc", null, null, null)).withRel("reservations") //todo: desc and reservationDate or reservation-date?
         );
         return userModel;
     }

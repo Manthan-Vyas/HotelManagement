@@ -21,8 +21,8 @@ public class HotelModelAssembler extends RepresentationModelAssemblerSupport<Hot
     public HotelModel toModel(@NonNull HotelResponseDto dto) {
         HotelModel hotelModel = new HotelModel(dto);
         hotelModel.add(
-                linkTo(methodOn(HotelAdminController.class).getHotelDetails(dto.getId())).withSelfRel(),
-                linkTo(methodOn(HotelAdminController.class).getHotelRooms(dto.getId())).withRel("rooms")
+                linkTo(methodOn(HotelAdminController.class).getHotelDetails(dto.getId(), null)).withSelfRel(),
+                linkTo(methodOn(HotelAdminController.class).getHotelRooms(dto.getId(), 0, 10, "number", "acs", null, null, null)).withRel("rooms")
         );
         return hotelModel;
     }

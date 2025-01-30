@@ -7,8 +7,6 @@ import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSuppor
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -23,9 +21,9 @@ public class ReservationModelAssembler extends RepresentationModelAssemblerSuppo
     public ReservationModel toModel(@NonNull ReservationResponseDto dto) {
         ReservationModel reservationModel = new ReservationModel(dto);
         reservationModel.add(
-                linkTo(methodOn(AdminController.class).getReservationDetails(dto.getId())).withSelfRel(),
-                linkTo(methodOn(AdminController.class).getUserDetails(UUID.fromString(dto.getUser().getUsername()))).withRel("user"),
-                linkTo(methodOn(AdminController.class).getRoomDetails(dto.getRoom().getId())).withRel("room")
+                linkTo(methodOn(AdminController.class).getReservationDetails(dto.getId(), null)).withSelfRel(),
+                linkTo(methodOn(AdminController.class).getUserDetails(dto.getUser().getUsername(), null)).withRel("user"),
+                linkTo(methodOn(AdminController.class).getRoomDetails(dto.getRoom().getId(), null)).withRel("room")
         );
         return reservationModel;
     }

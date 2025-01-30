@@ -21,8 +21,10 @@ public class AmenityModelAssembler extends RepresentationModelAssemblerSupport<A
     public AmenityModel toModel(@NonNull AmenityResponseDto dto) {
         AmenityModel amenityModel = new AmenityModel(dto);
         amenityModel.add(
-                linkTo(methodOn(AdminController.class).getAmenityDetails(dto.getId())).withSelfRel(),
-                linkTo(methodOn(AdminController.class).getAllAmenities()).withRel("allAmenities")
+                linkTo(methodOn(AdminController.class).getAmenityDetails(dto.getId(), null)).withSelfRel(),
+                linkTo(methodOn(AdminController.class).getAllAmenities(
+                        0, 10, "name", "asc", null, null, null
+                )).withRel("allAmenities")
         );
         return amenityModel;
     }

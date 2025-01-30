@@ -47,37 +47,46 @@ public class RoomService {
 
     public RoomResponseDto getRoomByReservationId(Long reservationId) {
         return roomRepository.findAll(
-                    where(RoomSpecification.hasFilter("reservation-id", reservationId.toString()))
+                        where(RoomSpecification.hasFilter("reservation-id", reservationId.toString()))
                 ).stream().findFirst().map(RoomMapper::toResponseDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with reservation id: " + reservationId));
     }
 
     public RoomResponseDto getRoomByHotelIdAndRoomNumber(Long hotelId, int roomNumber) {
         return roomRepository.findAll(
-                where(
-                        RoomSpecification.hasFilter("hotel-id", hotelId.toString())
-                ).and(RoomSpecification.hasFilter("number", String.valueOf(roomNumber))
-                ), Pageable.unpaged())
+                        where(
+                                RoomSpecification.hasFilter("hotel-id", hotelId.toString())
+                        ).and(RoomSpecification.hasFilter("number", String.valueOf(roomNumber))
+                        ), Pageable.unpaged())
                 .map(RoomMapper::toResponseDto).stream().findFirst().orElseThrow(() -> new ResourceNotFoundException("Room not found with hotel id: " + hotelId + " and room number: " + roomNumber));
     }
 
-    public Page<RoomResponseDto> getAllRooms(Pageable pageable) {
-        return roomRepository.findAll(pageable)
+    public Page<RoomResponseDto> getAllRooms(Pageable pageable, String filterBy, String filterValue) {
+        if (filterBy == null || filterValue == null) {
+            return roomRepository.findAll(pageable)
+                    .map(RoomMapper::toResponseDto);
+        }
+        return roomRepository.findAll(
+                        where(
+                                RoomSpecification.hasFilter(filterBy, filterValue)
+                        ),
+                        pageable
+                )
                 .map(RoomMapper::toResponseDto);
     }
 
     public Page<RoomResponseDto> getRoomsByHotelId(Long hotelId, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return roomRepository.findAll(
-                    where(RoomSpecification.hasFilter("hotel-id", hotelId.toString())),
-                    pageable
+                            where(RoomSpecification.hasFilter("hotel-id", hotelId.toString())),
+                            pageable
                     )
                     .map(RoomMapper::toResponseDto);
         }
         return roomRepository.findAll(
-               where(RoomSpecification.hasFilter("hotel-id", hotelId.toString()))
-               .and(where(RoomSpecification.hasFilter(filterBy, filterValue))),
-               pageable
+                where(RoomSpecification.hasFilter("hotel-id", hotelId.toString()))
+                        .and(where(RoomSpecification.hasFilter(filterBy, filterValue))),
+                pageable
         ).map(RoomMapper::toResponseDto);
     }
 
@@ -91,7 +100,7 @@ public class RoomService {
         }
         return roomRepository.findAll(
                 where(RoomSpecification.hasFilter("username", username))
-                .and(where(RoomSpecification.hasFilter(filterBy, filterValue))),
+                        .and(where(RoomSpecification.hasFilter(filterBy, filterValue))),
                 pageable
         ).map(RoomMapper::toResponseDto);
     }

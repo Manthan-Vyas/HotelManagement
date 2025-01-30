@@ -20,9 +20,9 @@ public class RoomModelAssembler extends RepresentationModelAssemblerSupport<Room
     @NonNull public RoomModel toModel(@NonNull RoomResponseDto dto) {
         RoomModel roomModel = new RoomModel(dto);
         roomModel.add(
-                linkTo(methodOn(HotelAdminController.class).getHotelRoomDetails(dto.getHotel().getId(), dto.getId())).withSelfRel(),
-                linkTo(methodOn(HotelAdminController.class).getHotelRoomReservations(dto.getHotel().getId(), dto.getId())).withRel("reservations"),
-                linkTo(methodOn(HotelAdminController.class).getHotelDetails(dto.getHotel().getId())).withRel("hotel")
+                linkTo(methodOn(HotelAdminController.class).getHotelRoomDetails(dto.getHotel().getId(), dto.getId(), null)).withSelfRel(),
+                linkTo(methodOn(HotelAdminController.class).getHotelRoomReservations(dto.getHotel().getId(), dto.getId(), 0, 10, "id", "asc", null, null, null)).withRel("reservations"),
+                linkTo(methodOn(HotelAdminController.class).getHotelDetails(dto.getHotel().getId(), null)).withRel("hotel")
         );
         return roomModel;
     }

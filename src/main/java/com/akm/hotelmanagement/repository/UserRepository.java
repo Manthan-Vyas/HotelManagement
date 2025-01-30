@@ -14,6 +14,5 @@ public interface UserRepository extends
   Optional<User> findByUsername(String username);
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
-
     void deleteByUsername(String username);
 }

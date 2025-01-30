@@ -120,6 +120,13 @@ public class UserService implements UserDetailsService {
         userRepository.deleteByUsername(username);
     }
 
+    public UserResponseDto changeUserEnabled(String username, boolean enabled) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username " + username));
+        user.setEnabled(enabled);
+        return UserMapper.toResponseDto(userRepository.save(user));
+    }
+
     private void checkForDuplicateFields(UpdateUserRequestDto dto, User user) {
         if (dto.getName() != null && dto.getName().equals(user.getName())) {
             throw new ResponseStatusException(
@@ -175,5 +182,13 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }

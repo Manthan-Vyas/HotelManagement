@@ -8,7 +8,6 @@ import com.akm.hotelmanagement.entity.Room;
 import com.akm.hotelmanagement.entity.util.RoomStatus;
 import com.akm.hotelmanagement.exception.ResourceAlreadyExistsException;
 import com.akm.hotelmanagement.exception.ResourceNotFoundException;
-import com.akm.hotelmanagement.mapper.RoomMapper;
 import com.akm.hotelmanagement.repository.HotelRepository;
 import com.akm.hotelmanagement.repository.RoomRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -145,7 +143,7 @@ class RoomServiceTest {
         Page<Room> roomPage = new PageImpl<>(Collections.singletonList(room));
         when(roomRepository.findAll(any(Pageable.class))).thenReturn(roomPage);
 
-        Page<RoomResponseDto> response = roomService.getAllRooms(pageable);
+        Page<RoomResponseDto> response = roomService.getAllRooms(pageable, null, null);
 
         assertNotNull(response);
         assertEquals(1, response.getTotalElements());

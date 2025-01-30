@@ -127,4 +127,14 @@ public class ReservationService {
         }
         reservationRepository.deleteById(id);
     }
+
+    public ReservationResponseDto cancelReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + reservationId));
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
+            throw new ResourceAlreadyExistsException("Reservation already cancelled");
+        }
+        reservation.setStatus(ReservationStatus.CANCELLED);
+        return ReservationMapper.toResponseDto(reservationRepository.save(reservation));
+    }
 }
