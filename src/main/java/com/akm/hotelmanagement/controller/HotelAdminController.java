@@ -18,6 +18,7 @@ import com.akm.hotelmanagement.service.ReservationService;
 import com.akm.hotelmanagement.service.RoomService;
 import com.akm.hotelmanagement.wrapper.PagedResponse;
 import com.akm.hotelmanagement.wrapper.ResponseWrapper;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -45,6 +46,7 @@ public class HotelAdminController {
     private final ReservationModelAssembler reservationModelAssembler;
 
     @GetMapping
+    @Operation(summary = "Hotel admin home", description = "Get the home page for hotel admin")
     public ResponseEntity<ResponseWrapper<Void>> getHotelAdminHome() {
         return ResponseEntity.ok(
                 ResponseWrapper.getNoContentResponseWrapper(
@@ -54,6 +56,7 @@ public class HotelAdminController {
     }
 
     @PostMapping("/hotels/{hotelId}/rooms")
+    @Operation(summary = "Add a room to a hotel", description = "Add a new room to a hotel by providing the required details as a CreateHotelRoomRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<RoomModel>> addHotelRoom(
             @PathVariable Long hotelId,
             @Valid @RequestBody CreateHotelRoomRequestDto dto,
@@ -74,6 +77,7 @@ public class HotelAdminController {
     }
 
     @GetMapping("/hotels/{hotelId}")
+    @Operation(summary = "Get hotel details", description = "Get details of a hotel by providing the hotel id")
     public ResponseEntity<ResponseWrapper<HotelModel>> getHotelDetails(
             @PathVariable Long hotelId,
             @Nullable HttpServletRequest request
@@ -89,6 +93,7 @@ public class HotelAdminController {
     }
 
     @GetMapping("/hotels/{hotelId}/rooms")
+    @Operation(summary = "Get hotel rooms", description = "Get all rooms of a hotel by providing the hotel id")
     public ResponseEntity<ResponseWrapper<PagedResponse<RoomModel>>> getHotelRooms(
             @PathVariable Long hotelId,
             @RequestParam(defaultValue = "0") int page,
@@ -113,6 +118,7 @@ public class HotelAdminController {
     }
 
     @GetMapping("/hotels/{hotelId}/rooms/{roomId}")
+    @Operation(summary = "Get room details", description = "Get details of a room by providing the hotel id and room id")
     public ResponseEntity<ResponseWrapper<RoomModel>> getHotelRoomDetails(
             @PathVariable Long hotelId,
             @PathVariable Long roomId,
@@ -132,6 +138,7 @@ public class HotelAdminController {
     }
 
     @GetMapping("/hotels/{hotelId}/rooms/{roomId}/reservations")
+    @Operation(summary = "Get room reservations", description = "Get all reservations of a room by providing the hotel id and room id")
     public ResponseEntity<ResponseWrapper<PagedResponse<ReservationModel>>> getHotelRoomReservations(
             @PathVariable Long hotelId,
             @PathVariable Long roomId,
@@ -160,6 +167,7 @@ public class HotelAdminController {
     }
 
     @GetMapping("/hotels/{hotelId}/rooms/{roomId}/reservations/{reservationId}")
+    @Operation(summary = "Get room reservation details", description = "Get details of a reservation of a room by providing the hotel id, room id, and reservation id")
     public ResponseEntity<ResponseWrapper<ReservationModel>> getHotelRoomReservationDetails(
             @PathVariable Long hotelId,
             @PathVariable Long roomId,
@@ -180,6 +188,7 @@ public class HotelAdminController {
     }
 
     @PatchMapping("/hotels/{hotelId}/rooms/{roomId}/reservations/{reservationId}/status")
+    @Operation(summary = "Update room reservation status", description = "Update the status of a reservation of a room by providing the hotel id, room id, reservation id, and the new status")
     public ResponseEntity<ResponseWrapper<ReservationModel>> updateHotelRoomReservationStatus(
             @PathVariable Long hotelId,
             @PathVariable Long roomId,
@@ -206,6 +215,7 @@ public class HotelAdminController {
     }
 
     @PutMapping("/hotels/{hotelId}")
+    @Operation(summary = "Update hotel details", description = "Update the details of a hotel by providing the hotel id and the required details as an UpdateHotelRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<HotelModel>> updateHotelDetails(
             @PathVariable Long hotelId,
             @Valid @RequestBody UpdateHotelRequestDto dto,
@@ -222,6 +232,7 @@ public class HotelAdminController {
     }
 
     @PatchMapping("/hotels/{hotelId}")
+    @Operation(summary = "Update hotel", description = "Update the details of a hotel by providing the hotel id and the required details as an UpdateHotelRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<HotelModel>> updateHotel(
             @PathVariable Long hotelId,
             @Valid @RequestBody UpdateHotelRequestDto dto,
@@ -238,6 +249,7 @@ public class HotelAdminController {
     }
 
     @PutMapping("/hotels/{hotelId}/rooms/{roomId}")
+    @Operation(summary = "Update room details", description = "Update the details of a room by providing the hotel id, room id, and the required details as an UpdateHotelRoomRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<RoomModel>> updateHotelRoomDetails(
             @PathVariable Long hotelId, @PathVariable Long roomId,
             @Valid @RequestBody UpdateHotelRoomRequestDto dto,
@@ -257,6 +269,7 @@ public class HotelAdminController {
     }
 
     @PatchMapping("/hotels/{hotelId}/rooms/{roomId}")
+    @Operation(summary = "Update room", description = "Update the details of a room by providing the hotel id, room id, and the required details as an UpdateHotelRoomRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<RoomModel>> updateHotelRoom(
             @PathVariable Long hotelId, @PathVariable Long roomId,
             @Valid @RequestBody UpdateHotelRoomRequestDto dto,
@@ -276,6 +289,7 @@ public class HotelAdminController {
     }
 
     @PatchMapping("/hotels/{hotelId}/rooms/{roomId}/satus")
+    @Operation(summary = "Update room status", description = "Update the status of a room by providing the hotel id, room id, and the new status")
     public ResponseEntity<ResponseWrapper<RoomModel>> updateHotelRoom(
             @PathVariable Long hotelId, @PathVariable Long roomId,
             @RequestParam String status,
@@ -300,6 +314,7 @@ public class HotelAdminController {
     }
 
     @DeleteMapping("/hotels/{hotelId}/rooms/{roomId}")
+    @Operation(summary = "Delete room", description = "Delete a room by providing the hotel id and room id")
     public ResponseEntity<ResponseWrapper<Void>> deleteHotelRoom(
             @PathVariable Long hotelId,
             @PathVariable Long roomId,

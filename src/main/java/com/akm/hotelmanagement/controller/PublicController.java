@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
@@ -39,6 +40,20 @@ public class PublicController {
     private final UserModelAssembler userModelAssembler;
     private final HotelModelAssembler hotelModelAssembler;
     private final RoomModelAssembler roomModelAssembler;
+    private final MessageSource messageSource;
+
+    @GetMapping
+    @Operation(summary = "Get welcome message", description = "Get a welcome message in the default language")
+    public ResponseEntity<ResponseWrapper<String>> getWelcomeMessage(
+            @Nullable HttpServletRequest request
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.getOkResponseWrapper(
+                        messageSource.getMessage("welcome.message", null, request.getLocale()),
+                        request
+                )
+        );
+    }
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user", description = "Register a new user with the provided details")
@@ -60,6 +75,7 @@ public class PublicController {
     }
 
     @GetMapping("/hotels")
+    @Operation(summary = "Get all hotels", description = "Get all hotels with pagination, sorting, and filtering options from the database")
     public ResponseEntity<ResponseWrapper<PagedResponse<HotelModel>>> getAllHotels(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -88,6 +104,7 @@ public class PublicController {
     }
 
     @GetMapping("/rooms")
+    @Operation(summary = "Get all rooms", description = "Get all rooms with pagination, sorting, and filtering options from the database")
     public ResponseEntity<ResponseWrapper<PagedResponse<RoomModel>>> getAllRooms(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

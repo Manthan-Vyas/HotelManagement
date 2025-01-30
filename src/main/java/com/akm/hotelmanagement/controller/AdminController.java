@@ -13,6 +13,7 @@ import com.akm.hotelmanagement.exception.ResourceAlreadyExistsException;
 import com.akm.hotelmanagement.service.*;
 import com.akm.hotelmanagement.wrapper.PagedResponse;
 import com.akm.hotelmanagement.wrapper.ResponseWrapper;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -46,6 +47,7 @@ public class AdminController {
     private final ReservationModelAssembler reservationModelAssembler;
 
     @GetMapping
+    @Operation(summary = "Admin home", description = "Get the admin home page")
     public ResponseEntity<ResponseWrapper<Void>> getAdminHome() {
         return ResponseEntity.ok(
                 ResponseWrapper.getNoContentResponseWrapper(
@@ -55,6 +57,7 @@ public class AdminController {
     }
 
     @PostMapping("/users")
+    @Operation(summary = "Create user", description = "Create a new user by providing the required details as a CreateUserRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<UserModel>> createUser(
             @Valid @RequestBody CreateUserRequestDto dto,
             @Nullable HttpServletRequest request
@@ -79,6 +82,7 @@ public class AdminController {
     }
 
     @PostMapping("/hotels")
+    @Operation(summary = "Create hotel", description = "Create a new hotel by providing the required details as a CreateHotelRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<HotelModel>> createHotel(
             @Valid @RequestBody CreateHotelRequestDto dto,
             @Nullable HttpServletRequest request
@@ -97,6 +101,7 @@ public class AdminController {
     }
 
     @PostMapping("/amenities")
+    @Operation(summary = "Create amenity", description = "Create a new amenity by providing the required details as a CreateAmenityRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<AmenityModel>> createAmenity(
             @Valid @RequestBody CreateAmenityRequestDto dto,
             @Nullable HttpServletRequest request
@@ -115,6 +120,7 @@ public class AdminController {
     }
 
     @GetMapping("/users")
+    @Operation(summary = "Get all users", description = "Get all users with pagination, sorting, and filtering options from the database")
     public ResponseEntity<ResponseWrapper<PagedResponse<UserModel>>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -129,7 +135,7 @@ public class AdminController {
                 filterBy,
                 filterValue
         );
-        if (responseData.isEmpty()) {
+        if (responseData == null ||responseData.isEmpty()) {
             return ResponseEntity.ok(
                     ResponseWrapper.getNoContentResponseWrapper(request)
             );
@@ -143,6 +149,7 @@ public class AdminController {
     }
 
     @GetMapping("/hotels")
+    @Operation(summary = "Get all hotels", description = "Get all hotels with pagination, sorting, and filtering options from the database")
     public ResponseEntity<ResponseWrapper<PagedResponse<HotelModel>>> getAllHotels(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -168,6 +175,7 @@ public class AdminController {
     }
 
     @GetMapping("/rooms")
+    @Operation(summary = "Get all rooms", description = "Get all rooms with pagination, sorting, and filtering options from the database")
     public ResponseEntity<ResponseWrapper<PagedResponse<RoomModel>>> getAllRooms(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -193,6 +201,7 @@ public class AdminController {
     }
 
     @GetMapping("/amenities")
+    @Operation(summary = "Get all amenities", description = "Get all amenities with pagination, sorting, and filtering options from the database")
     public ResponseEntity<ResponseWrapper<PagedResponse<AmenityModel>>> getAllAmenities(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -218,6 +227,7 @@ public class AdminController {
     }
 
     @GetMapping("/reservations")
+    @Operation(summary = "Get all reservations", description = "Get all reservations with pagination, sorting, and filtering options from the database")
     public ResponseEntity<ResponseWrapper<PagedResponse<ReservationModel>>> getAllReservations(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -243,6 +253,7 @@ public class AdminController {
     }
 
     @GetMapping("/users/{username}")
+    @Operation(summary = "Get user details", description = "Get the details of a user by providing the username in the path")
     public ResponseEntity<ResponseWrapper<UserModel>> getUserDetails(
             @PathVariable String username,
             @Nullable HttpServletRequest request
@@ -256,6 +267,7 @@ public class AdminController {
     }
 
     @GetMapping("/hotels/{hotelId}")
+    @Operation(summary = "Get hotel details", description = "Get the details of a hotel by providing the hotel ID in the path")
     public ResponseEntity<ResponseWrapper<HotelModel>> getHotelDetails(
             @PathVariable Long hotelId,
             @Nullable HttpServletRequest request
@@ -269,6 +281,7 @@ public class AdminController {
     }
 
     @GetMapping("/rooms/{roomId}")
+    @Operation(summary = "Get room details", description = "Get the details of a room by providing the room ID in the path")
     public ResponseEntity<ResponseWrapper<RoomModel>> getRoomDetails(
             @PathVariable Long roomId,
             @Nullable HttpServletRequest request
@@ -282,6 +295,7 @@ public class AdminController {
     }
 
     @GetMapping("/amenities/{amenityId}")
+    @Operation(summary = "Get amenity details", description = "Get the details of an amenity by providing the amenity ID in the path")
     public ResponseEntity<ResponseWrapper<AmenityModel>> getAmenityDetails(
             @PathVariable Long amenityId,
             @Nullable HttpServletRequest request
@@ -295,6 +309,7 @@ public class AdminController {
     }
 
     @GetMapping("/reservations/{reservationId}")
+    @Operation(summary = "Get reservation details", description = "Get the details of a reservation by providing the reservation ID in the path")
     public ResponseEntity<ResponseWrapper<ReservationModel>> getReservationDetails(
             @PathVariable Long reservationId,
             @Nullable HttpServletRequest request
@@ -310,6 +325,7 @@ public class AdminController {
     }
 
     @PutMapping("/users/{username}")
+    @Operation(summary = "Update user details", description = "Update the details of a user by providing the username in the path and the required details as an UpdateUserRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<UserModel>> updateUserDetails(
             @PathVariable String username,
             @Valid @RequestBody UpdateUserRequestDto dto,
@@ -326,6 +342,7 @@ public class AdminController {
     }
 
     @PatchMapping("/users/{username}")
+    @Operation(summary = "Update user", description = "Update the details of a user by providing the username in the path and the required details as an UpdateUserRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<UserModel>> updateUser(
             @PathVariable String username,
             @Valid @RequestBody UpdateUserRequestDto dto,
@@ -342,6 +359,7 @@ public class AdminController {
     }
 
     @PutMapping("/hotels/{hotelId}")
+    @Operation(summary = "Update hotel details", description = "Update the details of a hotel by providing the hotel ID in the path and the required details as an UpdateHotelRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<HotelModel>> updateHotelDetails(
             @PathVariable Long hotelId,
             @Valid @RequestBody UpdateHotelRequestDto dto,
@@ -358,6 +376,7 @@ public class AdminController {
     }
 
     @PatchMapping("/hotels/{hotelId}")
+    @Operation(summary = "Update hotel", description = "Update the details of a hotel by providing the hotel ID in the path and the required details as an UpdateHotelRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<HotelModel>> updateHotel(
             @PathVariable Long hotelId,
             @Valid @RequestBody UpdateHotelRequestDto dto,
@@ -374,6 +393,7 @@ public class AdminController {
     }
 
     @PutMapping("/amenities/{amenityId}")
+    @Operation(summary = "Update amenity details", description = "Update the details of an amenity by providing the amenity ID in the path and the required details as an UpdateAmenityRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<AmenityModel>> updateAmenityDetails(
             @PathVariable Long amenityId,
             @Valid @RequestBody UpdateAmenityRequestDto dto,
@@ -390,6 +410,7 @@ public class AdminController {
     }
 
     @PatchMapping("/amenities/{amenityId}")
+    @Operation(summary = "Update amenity", description = "Update the details of an amenity by providing the amenity ID in the path and the required details as an UpdateAmenityRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<AmenityModel>> updateAmenity(
             @PathVariable Long amenityId,
             @Valid @RequestBody UpdateAmenityRequestDto dto,
@@ -406,6 +427,7 @@ public class AdminController {
     }
 
     @PatchMapping("/users/{username}/enabled")
+    @Operation(summary = "Change user enabled status", description = "Change the enabled status of a user by providing the username in the path and the enabled status as a query parameter")
     public ResponseEntity<ResponseWrapper<UserModel>> changeUserEnabled(
             @PathVariable String username,
             @RequestParam boolean enabled,
@@ -422,6 +444,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/users/{username}")
+    @Operation(summary = "Delete user", description = "Delete a user by providing the username in the path")
     public ResponseEntity<ResponseWrapper<UserModel>> deleteUser(
             @PathVariable String username,
             @Nullable HttpServletRequest request
@@ -435,6 +458,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/hotels/{hotelId}")
+    @Operation(summary = "Delete hotel", description = "Delete a hotel by providing the hotel ID in the path")
     public ResponseEntity<ResponseWrapper<HotelModel>> deleteHotel(
             @PathVariable Long hotelId,
             @Nullable HttpServletRequest request
@@ -448,6 +472,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/amenities/{amenityId}")
+    @Operation(summary = "Delete amenity", description = "Delete an amenity by providing the amenity ID in the path")
     public ResponseEntity<ResponseWrapper<Void>> deleteAmenity(
             @PathVariable Long amenityId,
             @Nullable HttpServletRequest request
@@ -461,6 +486,7 @@ public class AdminController {
     }
 
     @GetMapping("/amenities/{amenityId}/hotels")
+    @Operation(summary = "Get amenity hotels", description = "Get all hotels with a specific amenity by providing the amenity ID in the path")
     public ResponseEntity<ResponseWrapper<PagedResponse<HotelModel>>> getAmenityHotels(
             @PathVariable Long amenityId,
             @RequestParam(defaultValue = "0") int page,

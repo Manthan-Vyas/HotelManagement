@@ -17,6 +17,7 @@ import com.akm.hotelmanagement.service.RoomService;
 import com.akm.hotelmanagement.service.UserService;
 import com.akm.hotelmanagement.wrapper.PagedResponse;
 import com.akm.hotelmanagement.wrapper.ResponseWrapper;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -47,7 +48,18 @@ public class UserController {
     private final RoomModelAssembler roomModelAssembler;
     private final ReservationModelAssembler reservationModelAssembler;
 
+    @GetMapping
+    @Operation(summary = "User home", description = "Get the home page of a user")
+    public ResponseEntity<ResponseWrapper<Void>> getUserHome() {
+        return ResponseEntity.ok(
+                ResponseWrapper.getNoContentResponseWrapper(
+                        null
+                )
+        );
+    }
+
     @GetMapping("/{username}")
+    @Operation(summary = "Get user details", description = "Get details of a user by providing the username")
     public ResponseEntity<ResponseWrapper<UserModel>> getUserDetails(
             @PathVariable String username,
             @Nullable HttpServletRequest request
@@ -61,6 +73,7 @@ public class UserController {
     }
 
     @PutMapping("/{username}")
+    @Operation(summary = "Update user details", description = "Update details of a user by providing the username and the required details as an UpdateUserRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<UserModel>> updateUserDetails(
             @PathVariable String username,
             @Valid @RequestBody UpdateUserRequestDto dto,
@@ -77,6 +90,7 @@ public class UserController {
     }
 
     @PatchMapping("/{username}")
+    @Operation(summary = "Update user", description = "Update details of a user by providing the username and the required details as an UpdateUserRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<UserModel>> updateUser(
             @PathVariable String username,
             @Valid @RequestBody UpdateUserRequestDto dto,
@@ -93,6 +107,7 @@ public class UserController {
     }
 
     @PostMapping("/{username}/reservations/{roomId}")
+    @Operation(summary = "Book a room", description = "Book a room by providing the username, room ID, and the required details as a CreateOrUpdateUserRoomReservationRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<ReservationModel>> bookReservation(
             @PathVariable String username,
             @PathVariable Long roomId,
@@ -114,6 +129,7 @@ public class UserController {
     }
 
     @GetMapping("/{username}/reservations")
+    @Operation(summary = "Get user reservations", description = "Get all reservations of a user by providing the username with pagination, sorting, and filtering options")
     public ResponseEntity<ResponseWrapper<PagedResponse<ReservationModel>>> getUserReservations(
             @PathVariable String username,
             @RequestParam(defaultValue = "0") int page,
@@ -138,6 +154,7 @@ public class UserController {
     }
 
     @GetMapping("/{username}/reservations/{reservationId}")
+    @Operation(summary = "Get user reservation", description = "Get a reservation of a user by providing the username and reservation ID")
     public ResponseEntity<ResponseWrapper<ReservationModel>> getUserReservation(
             @PathVariable String username,
             @PathVariable Long reservationId,
@@ -158,6 +175,7 @@ public class UserController {
     }
 
     @PutMapping("/{username}/reservations/{reservationId}")
+    @Operation(summary = "Update user reservation", description = "Update a reservation of a user by providing the username, reservation ID, and the required details as a CreateOrUpdateUserRoomReservationRequestDto JSON object in the request body")
     public ResponseEntity<ResponseWrapper<ReservationModel>> updateReservation(
             @PathVariable String username,
             @PathVariable Long reservationId,
@@ -177,7 +195,8 @@ public class UserController {
         );
     }
 
-    @PutMapping("/{username}/reservations/{reservationId}/cancel")
+    @PatchMapping("/{username}/reservations/{reservationId}/cancel")
+    @Operation(summary = "Cancel user reservation", description = "Cancel a reservation of a user by providing the username and reservation ID")
     public ResponseEntity<ResponseWrapper<ReservationModel>> cancelReservation(
             @PathVariable String username,
             @PathVariable Long reservationId,
@@ -197,6 +216,7 @@ public class UserController {
     }
 
     @GetMapping("/hotels")
+    @Operation(summary = "Get all hotels", description = "Get all hotels with pagination, sorting, and filtering options")
     public ResponseEntity<ResponseWrapper<PagedResponse<HotelModel>>> getAllHotels(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -219,6 +239,7 @@ public class UserController {
     }
 
     @GetMapping("/rooms")
+    @Operation(summary = "Get all rooms", description = "Get all rooms with pagination, sorting, and filtering options")
     public ResponseEntity<ResponseWrapper<PagedResponse<RoomModel>>> getAllRooms(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
