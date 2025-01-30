@@ -5,6 +5,7 @@ import com.akm.hotelmanagement.wrapper.util.DebugInfo;
 import com.akm.hotelmanagement.wrapper.util.ErrorDetails;
 import jakarta.validation.ValidationException;
 import lombok.NonNull;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.StringJoiner;
 
@@ -57,6 +59,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             return HttpStatus.valueOf(((RestClientResponseException) ex).getStatusCode().value());
         } else if (ex instanceof HotelManagementApiException) {
             return ((HotelManagementApiException) ex).httpStatus;
+        } else if (ex instanceof DataIntegrityViolationException) {
+            return HttpStatus.CONFLICT;
+        } else if (ex instanceof NoResourceFoundException) {
+            return HttpStatus.NOT_FOUND;
         } else {
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }

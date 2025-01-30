@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static org.springframework.data.jpa.domain.Specification.where;
@@ -47,7 +48,9 @@ public class ReservationService {
         reservation.setCheckIn(dto.getCheckIn());
         reservation.setCheckOut(dto.getCheckOut());
         reservation.setNumberOfGuests(dto.getNumberOfGuests());
-        reservation.setTotalPrice(room.getPricePerNight()); // todo: can add other charges or fees here
+        long daysOfStay = ChronoUnit.DAYS.between(dto.getCheckIn(), dto.getCheckOut());
+        double totalPrice = room.getPricePerNight() * (daysOfStay + 1);
+        reservation.setTotalPrice(totalPrice); // todo: can add other charges or fees here
         reservation.setStatus(ReservationStatus.PENDING);
         reservation.setRoom(room);
         reservation.setUser(user);

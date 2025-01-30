@@ -35,6 +35,7 @@ public class Room {
     @Column(name = "price_per_night", nullable = false)
     private double pricePerNight;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private RoomStatus status;
 
