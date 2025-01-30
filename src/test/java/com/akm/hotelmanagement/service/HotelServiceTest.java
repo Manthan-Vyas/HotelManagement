@@ -6,6 +6,7 @@ import com.akm.hotelmanagement.dto.hotel.HotelResponseDto;
 import com.akm.hotelmanagement.entity.Hotel;
 import com.akm.hotelmanagement.exception.ResourceAlreadyExistsException;
 import com.akm.hotelmanagement.exception.ResourceNotFoundException;
+import com.akm.hotelmanagement.mapper.HotelMapper;
 import com.akm.hotelmanagement.repository.HotelRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +34,9 @@ class HotelServiceTest {
 
     @Mock
     private HotelRepository hotelRepository;
+
+    @Mock
+    private HotelMapper hotelMapper;
 
     @InjectMocks
     private HotelService hotelService;
@@ -60,7 +65,9 @@ class HotelServiceTest {
     @Test
     void testCreateHotel() {
         when(hotelRepository.existsByName(anyString())).thenReturn(false);
+        when(hotelMapper.toEntity(any(CreateHotelRequestDto.class))).thenReturn(hotel);
         when(hotelRepository.save(any(Hotel.class))).thenReturn(hotel);
+        when(hotelMapper.toResponseDto(any(Hotel.class))).thenReturn(new HotelResponseDto(1L, "Hotel California", "123 Sunset Blvd", "Los Angeles", "CA", "90001", "A lovely place", 5.0, new HashSet<>(), new HashSet<>(), new HashSet<>()));
 
         HotelResponseDto response = hotelService.createHotel(createHotelRequestDto);
 
@@ -79,6 +86,7 @@ class HotelServiceTest {
     @Test
     void testGetHotelById() {
         when(hotelRepository.findById(anyLong())).thenReturn(Optional.of(hotel));
+        when(hotelMapper.toResponseDto(any(Hotel.class))).thenReturn(new HotelResponseDto(1L, "Hotel California", "123 Sunset Blvd", "Los Angeles", "CA", "90001", "A lovely place", 5.0, new HashSet<>(), new HashSet<>(), new HashSet<>()));
 
         HotelResponseDto response = hotelService.getHotelById(1L);
 
@@ -98,6 +106,7 @@ class HotelServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Hotel> hotelPage = new PageImpl<>(Collections.singletonList(hotel));
         when(hotelRepository.findAll(any(Pageable.class))).thenReturn(hotelPage);
+        when(hotelMapper.toResponseDto(any(Hotel.class))).thenReturn(new HotelResponseDto(1L, "Hotel California", "123 Sunset Blvd", "Los Angeles", "CA", "90001", "A lovely place", 5.0, new HashSet<>(), new HashSet<>(), new HashSet<>()));
 
         Page<HotelResponseDto> response = hotelService.getAllHotels(pageable, null, null);
 
@@ -109,6 +118,7 @@ class HotelServiceTest {
     void testUpdateHotel() {
         when(hotelRepository.findById(anyLong())).thenReturn(Optional.of(hotel));
         when(hotelRepository.save(any(Hotel.class))).thenReturn(hotel);
+        when(hotelMapper.toResponseDto(any(Hotel.class))).thenReturn(new HotelResponseDto(1L, "Hotel California", "123 Sunset Blvd", "Los Angeles", "CA", "90001", "A lovely place", 5.0, new HashSet<>(), new HashSet<>(), new HashSet<>()));
 
         HotelResponseDto response = hotelService.updateHotel(1L, updateHotelRequestDto, true);
 

@@ -8,6 +8,7 @@ import com.akm.hotelmanagement.entity.Room;
 import com.akm.hotelmanagement.entity.util.RoomStatus;
 import com.akm.hotelmanagement.exception.ResourceAlreadyExistsException;
 import com.akm.hotelmanagement.exception.ResourceNotFoundException;
+import com.akm.hotelmanagement.mapper.RoomMapper;
 import com.akm.hotelmanagement.repository.HotelRepository;
 import com.akm.hotelmanagement.repository.RoomRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -36,6 +38,9 @@ class RoomServiceTest {
 
     @Mock
     private HotelRepository hotelRepository;
+
+    @Mock
+    private RoomMapper roomMapper;
 
     @InjectMocks
     private RoomService roomService;
@@ -70,7 +75,13 @@ class RoomServiceTest {
     void testCreateRoom() {
         when(roomRepository.existsByNumber(anyInt())).thenReturn(false);
         when(hotelRepository.findById(anyLong())).thenReturn(Optional.of(hotel));
-        when(roomRepository.save(any(Room.class))).thenReturn(room);
+        when(roomMapper.toEntity(any(CreateHotelRoomRequestDto.class))).thenReturn(room);
+        when(roomRepository.save(any(Room.class))).thenAnswer(invocation -> {
+            Room room = invocation.getArgument(0);
+            room.setId(1L);
+            return room;
+        });
+        when(roomMapper.toResponseDto(any(Room.class))).thenReturn(new RoomResponseDto(1L, 101, "Deluxe", "A deluxe room", 2, 150.0, RoomStatus.AVAILABLE, new HashSet<>(Collections.singletonList("image1.jpg")), 1L, new HashSet<>()));
 
         RoomResponseDto response = roomService.createRoom(createRoomRequestDto, 1L);
 
@@ -89,6 +100,7 @@ class RoomServiceTest {
     @Test
     void testGetRoomById() {
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
+        when(roomMapper.toResponseDto(any(Room.class))).thenReturn(new RoomResponseDto(1L, 101, "Deluxe", "A deluxe room", 2, 150.0, RoomStatus.AVAILABLE, new HashSet<>(Collections.singletonList("image1.jpg")), 1L, new HashSet<>()));
 
         RoomResponseDto response = roomService.getRoomById(1L);
 
@@ -106,6 +118,7 @@ class RoomServiceTest {
     @Test
     void testGetRoomByReservationId() {
         when(roomRepository.findAll(any(Specification.class))).thenReturn(Collections.singletonList(room));
+        when(roomMapper.toResponseDto(any(Room.class))).thenReturn(new RoomResponseDto(1L, 101, "Deluxe", "A deluxe room", 2, 150.0, RoomStatus.AVAILABLE, new HashSet<>(Collections.singletonList("image1.jpg")), 1L, new HashSet<>()));
 
         RoomResponseDto response = roomService.getRoomByReservationId(1L);
 
@@ -123,6 +136,7 @@ class RoomServiceTest {
     @Test
     void testGetRoomByHotelIdAndRoomNumber() {
         when(roomRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(room)));
+        when(roomMapper.toResponseDto(any(Room.class))).thenReturn(new RoomResponseDto(1L, 101, "Deluxe", "A deluxe room", 2, 150.0, RoomStatus.AVAILABLE, new HashSet<>(Collections.singletonList("image1.jpg")), 1L, new HashSet<>()));
 
         RoomResponseDto response = roomService.getRoomByHotelIdAndRoomNumber(1L, 101);
 
@@ -142,6 +156,7 @@ class RoomServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Room> roomPage = new PageImpl<>(Collections.singletonList(room));
         when(roomRepository.findAll(any(Pageable.class))).thenReturn(roomPage);
+        when(roomMapper.toResponseDto(any(Room.class))).thenReturn(new RoomResponseDto(1L, 101, "Deluxe", "A deluxe room", 2, 150.0, RoomStatus.AVAILABLE, new HashSet<>(Collections.singletonList("image1.jpg")), 1L, new HashSet<>()));
 
         Page<RoomResponseDto> response = roomService.getAllRooms(pageable, null, null);
 
@@ -153,6 +168,7 @@ class RoomServiceTest {
     void testUpdateRoom() {
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
         when(roomRepository.save(any(Room.class))).thenReturn(room);
+        when(roomMapper.toResponseDto(any(Room.class))).thenReturn(new RoomResponseDto(1L, 101, "Deluxe", "A deluxe room", 2, 150.0, RoomStatus.AVAILABLE, new HashSet<>(Collections.singletonList("image1.jpg")), 1L, new HashSet<>()));
 
         RoomResponseDto response = roomService.updateRoom(1L, updateRoomRequestDto, true);
 
@@ -172,6 +188,7 @@ class RoomServiceTest {
     void testUpdateRoomStatus() {
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
         when(roomRepository.save(any(Room.class))).thenReturn(room);
+        when(roomMapper.toResponseDto(any(Room.class))).thenReturn(new RoomResponseDto(1L, 101, "Deluxe", "A deluxe room", 2, 150.0, RoomStatus.OCCUPIED, new HashSet<>(Collections.singletonList("image1.jpg")), 1L, new HashSet<>()));
 
         RoomResponseDto response = roomService.updateRoomStatus(1L, RoomStatus.OCCUPIED);
 
