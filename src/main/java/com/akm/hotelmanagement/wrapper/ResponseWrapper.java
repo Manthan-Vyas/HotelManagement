@@ -9,6 +9,8 @@ import lombok.*;
 
 import java.util.List;
 
+import static com.akm.hotelmanagement.util.Utils.emptyJson;
+
 @Getter
 @Setter
 @ToString
@@ -61,12 +63,13 @@ public class ResponseWrapper<T> { // todo: make this extend from ResponseEntity<
         );
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> ResponseWrapper<T> getErrorResponseWrapper(int code, String message, ErrorDetails error, HttpServletRequest request) {
         return getResponseWrapper(
                 false,
                 code,
                 message,
-                null,
+                (T) emptyJson,
                 error,
                 request
         );

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 import static org.springframework.data.jpa.domain.Specification.where;
@@ -46,6 +47,7 @@ public class ReservationService {
         Reservation reservation = new Reservation();
         reservation.setCheckIn(dto.getCheckIn());
         reservation.setCheckOut(dto.getCheckOut());
+        reservation.setReservationDate(LocalDate.now());
         reservation.setNumberOfGuests(dto.getNumberOfGuests());
         long daysOfStay = ChronoUnit.DAYS.between(dto.getCheckIn(), dto.getCheckOut());
         double totalPrice = room.getPricePerNight() * (daysOfStay + 1);
