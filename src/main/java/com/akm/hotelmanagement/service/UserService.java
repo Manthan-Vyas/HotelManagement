@@ -30,6 +30,8 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final UserMapper userMapper;
+
     public UserResponseDto createUser(CreateUserRequestDto userCreatDto) {
         if (userRepository.existsByUsername(userCreatDto.getUsername())) {
             throw new ResourceAlreadyExistsException("Username already exists with username: " + userCreatDto.getUsername());
@@ -37,34 +39,34 @@ public class UserService implements UserDetailsService {
         if (userRepository.existsByEmail(userCreatDto.getEmail())) {
             throw new ResourceAlreadyExistsException("Email already exists with email: " + userCreatDto.getEmail());
         }
-        User user = UserMapper.toEntity(userCreatDto);
+        User user = userMapper.toEntity(userCreatDto);
         user.setPassword(passwordEncoder.encode(userCreatDto.getPassword()));
         user.setRole(UserRole.USER);
         user.setEnabled(true);
-        return UserMapper.toResponseDto(userRepository.save(user));
+        return userMapper.toResponseDto(userRepository.save(user));
     }
 
     public UserResponseDto getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .map(UserMapper::toResponseDto)
+                .map(userMapper::toResponseDto)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     }
 
     public UserResponseDto getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .map(UserMapper::toResponseDto)
+                .map(userMapper::toResponseDto)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
     public Page<UserResponseDto> getAllUsers(Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return userRepository.findAll(pageable)
-                    .map(UserMapper::toResponseDto);
+                    .map(userMapper::toResponseDto);
         }
         return userRepository.findAll(
                 where(UserSpecifications.hasFilter(filterBy, filterValue)),
                 pageable
-        ).map(UserMapper::toResponseDto);
+        ).map(userMapper::toResponseDto);
     }
 
     public Page<UserResponseDto> getAdmins(Pageable pageable, String filterBy, String filterValue) {
@@ -72,14 +74,14 @@ public class UserService implements UserDetailsService {
             return userRepository.findAll(
                     where(UserSpecifications.hasFilter("role", UserRole.ADMIN.name())),
                     pageable
-            ).map(UserMapper::toResponseDto);
+            ).map(userMapper::toResponseDto);
         }
         return userRepository.findAll(
                 where(UserSpecifications.hasFilter("role", UserRole.ADMIN.name()).and(
                         where(UserSpecifications.hasFilter(filterBy, filterValue))
                 )),
                 pageable
-        ).map(UserMapper::toResponseDto);
+        ).map(userMapper::toResponseDto);
     }
 
     public UserResponseDto updateUser(String username, UpdateUserRequestDto dto, boolean isPut) {
@@ -102,7 +104,7 @@ public class UserService implements UserDetailsService {
         if (!isPut) {
             checkForDuplicateFields(dto, user);
             updateUserFields(dto, user);
-            return UserMapper.toResponseDto(userRepository.save(user));
+            return userMapper.toResponseDto(userRepository.save(user));
         }
         // todo: check if another user exists with email or password provided in dto
         user.setUsername(dto.getUsername());
@@ -110,7 +112,7 @@ public class UserService implements UserDetailsService {
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setPhone(dto.getPhone());
-        return UserMapper.toResponseDto(userRepository.save(user));
+        return userMapper.toResponseDto(userRepository.save(user));
     }
 
     public void deleteUser(String username) {
@@ -124,7 +126,7 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with username " + username));
         user.setEnabled(enabled);
-        return UserMapper.toResponseDto(userRepository.save(user));
+        return userMapper.toResponseDto(userRepository.save(user));
     }
 
     private void checkForDuplicateFields(UpdateUserRequestDto dto, User user) {

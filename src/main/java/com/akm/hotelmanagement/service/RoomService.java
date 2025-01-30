@@ -24,8 +24,11 @@ import static org.springframework.data.jpa.domain.Specification.where;
 @Service
 @RequiredArgsConstructor
 public class RoomService {
+
     private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
+
+    private final RoomMapper roomMapper;
 
     public RoomResponseDto createRoom(CreateHotelRoomRequestDto roomCreateDto, Long hotelId) {
         if (roomRepository.existsByNumber(roomCreateDto.getNumber())) {
@@ -33,22 +36,22 @@ public class RoomService {
         }
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id: " + hotelId));
-        Room room = RoomMapper.toEntity(roomCreateDto);
+        Room room = roomMapper.toEntity(roomCreateDto);
         room.setStatus(RoomStatus.AVAILABLE);
         room.setHotel(hotel);
-        return RoomMapper.toResponseDto(roomRepository.save(room));
+        return roomMapper.toResponseDto(roomRepository.save(room));
     }
 
     public RoomResponseDto getRoomById(Long id) {
         return roomRepository.findById(id)
-                .map(RoomMapper::toResponseDto)
+                .map(roomMapper::toResponseDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + id));
     }
 
     public RoomResponseDto getRoomByReservationId(Long reservationId) {
         return roomRepository.findAll(
                         where(RoomSpecification.hasFilter("reservation-id", reservationId.toString()))
-                ).stream().findFirst().map(RoomMapper::toResponseDto)
+                ).stream().findFirst().map(roomMapper::toResponseDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with reservation id: " + reservationId));
     }
 
@@ -58,13 +61,13 @@ public class RoomService {
                                 RoomSpecification.hasFilter("hotel-id", hotelId.toString())
                         ).and(RoomSpecification.hasFilter("number", String.valueOf(roomNumber))
                         ), Pageable.unpaged())
-                .map(RoomMapper::toResponseDto).stream().findFirst().orElseThrow(() -> new ResourceNotFoundException("Room not found with hotel id: " + hotelId + " and room number: " + roomNumber));
+                .map(roomMapper::toResponseDto).stream().findFirst().orElseThrow(() -> new ResourceNotFoundException("Room not found with hotel id: " + hotelId + " and room number: " + roomNumber));
     }
 
     public Page<RoomResponseDto> getAllRooms(Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return roomRepository.findAll(pageable)
-                    .map(RoomMapper::toResponseDto);
+                    .map(roomMapper::toResponseDto);
         }
         return roomRepository.findAll(
                         where(
@@ -72,7 +75,7 @@ public class RoomService {
                         ),
                         pageable
                 )
-                .map(RoomMapper::toResponseDto);
+                .map(roomMapper::toResponseDto);
     }
 
     public Page<RoomResponseDto> getRoomsByHotelId(Long hotelId, Pageable pageable, String filterBy, String filterValue) {
@@ -81,13 +84,13 @@ public class RoomService {
                             where(RoomSpecification.hasFilter("hotel-id", hotelId.toString())),
                             pageable
                     )
-                    .map(RoomMapper::toResponseDto);
+                    .map(roomMapper::toResponseDto);
         }
         return roomRepository.findAll(
                 where(RoomSpecification.hasFilter("hotel-id", hotelId.toString()))
                         .and(where(RoomSpecification.hasFilter(filterBy, filterValue))),
                 pageable
-        ).map(RoomMapper::toResponseDto);
+        ).map(roomMapper::toResponseDto);
     }
 
     public Page<RoomResponseDto> getRoomsByUsername(String username, Pageable pageable, String filterBy, String filterValue) {
@@ -96,13 +99,13 @@ public class RoomService {
                     where(
                             RoomSpecification.hasFilter("username", username)),
                     pageable
-            ).map(RoomMapper::toResponseDto);
+            ).map(roomMapper::toResponseDto);
         }
         return roomRepository.findAll(
                 where(RoomSpecification.hasFilter("username", username))
                         .and(where(RoomSpecification.hasFilter(filterBy, filterValue))),
                 pageable
-        ).map(RoomMapper::toResponseDto);
+        ).map(roomMapper::toResponseDto);
     }
 
     public RoomResponseDto updateRoom(Long id, UpdateHotelRoomRequestDto dto, boolean isPut) {
@@ -125,7 +128,7 @@ public class RoomService {
         if (!isPut) {
             checkForDuplicateFields(dto, room);
             updateRoomFields(dto, room);
-            return RoomMapper.toResponseDto(roomRepository.save(room));
+            return roomMapper.toResponseDto(roomRepository.save(room));
         }
 
         room.setNumber(dto.getNumber());
@@ -134,14 +137,14 @@ public class RoomService {
         room.setCapacity(dto.getCapacity());
         room.setPricePerNight(dto.getPricePerNight());
         room.setImageUrls(dto.getImageUrls());
-        return RoomMapper.toResponseDto(roomRepository.save(room));
+        return roomMapper.toResponseDto(roomRepository.save(room));
     }
 
     public RoomResponseDto updateRoomStatus(Long id, RoomStatus status) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with Id: " + id));
         room.setStatus(status);
-        return RoomMapper.toResponseDto(roomRepository.save(room));
+        return roomMapper.toResponseDto(roomRepository.save(room));
     }
 
     public void deleteRoom(Long id) {

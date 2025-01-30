@@ -22,26 +22,28 @@ import static org.springframework.data.jpa.domain.Specification.where;
 @Service
 @RequiredArgsConstructor
 public class HotelService {
+
     private final HotelRepository hotelRepository;
+    private final HotelMapper hotelMapper;
 
     public HotelResponseDto createHotel(CreateHotelRequestDto hotelCreateDto) {
         if (hotelRepository.existsByName(hotelCreateDto.getName())) {
             throw new ResourceAlreadyExistsException("Hotel already exists with name: " + hotelCreateDto.getName());
         }
-        Hotel hotel = HotelMapper.toEntity(hotelCreateDto);
-        return HotelMapper.toResponseDto(hotelRepository.save(hotel));
+        Hotel hotel = hotelMapper.toEntity(hotelCreateDto);
+        return hotelMapper.toResponseDto(hotelRepository.save(hotel));
     }
 
     public HotelResponseDto getHotelById(Long id) {
         return hotelRepository.findById(id)
-                .map(HotelMapper::toResponseDto)
+                .map(hotelMapper::toResponseDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id: " + id));
     }
 
     public Page<HotelResponseDto> getAllHotels(Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return hotelRepository.findAll(pageable)
-                    .map(HotelMapper::toResponseDto);
+                    .map(hotelMapper::toResponseDto);
         }
         return hotelRepository.findAll(
                 where(
@@ -52,7 +54,7 @@ public class HotelService {
                 ),
                 pageable
                 )
-                .map(HotelMapper::toResponseDto);
+                .map(hotelMapper::toResponseDto);
     }
 
     public HotelResponseDto updateHotel(Long id, UpdateHotelRequestDto dto, boolean isPut) {
@@ -75,7 +77,7 @@ public class HotelService {
         if (!isPut) {
             checkForDuplicateFields(dto, hotel);
             updateHotelFields(dto, hotel);
-            return HotelMapper.toResponseDto(hotelRepository.save(hotel));
+            return hotelMapper.toResponseDto(hotelRepository.save(hotel));
         }
 
         hotel.setName(dto.getName());
@@ -86,7 +88,7 @@ public class HotelService {
         hotel.setDescription(dto.getDescription());
         hotel.setRating(dto.getRating());
         hotel.setImageUrls(dto.getImageUrls());
-        return HotelMapper.toResponseDto(hotelRepository.save(hotel));
+        return hotelMapper.toResponseDto(hotelRepository.save(hotel));
     }
 
     public void deleteHotel(Long id) {
