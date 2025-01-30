@@ -60,7 +60,24 @@ public class SecurityConfig {
                 .formLogin(formLogin ->
                         formLogin
                                 .loginProcessingUrl("/login")
-                                .successHandler((request, response, authentication) -> response.sendRedirect("/users/" + authentication.getName()))
+                                .successHandler(
+                                        (request, response, authentication) -> {
+                                            switch (authentication.getAuthorities().toString()) {
+                                                case "[ROLE_ADMIN]":
+                                                    response.sendRedirect("/admin/users");
+                                                    break;
+                                                case "[ROLE_USER]":
+                                                    response.sendRedirect("/users/" + authentication.getName());
+                                                    break;
+                                                case "[ROLE_HOTEL_ADMIN]":
+                                                    response.sendRedirect("/hotel-admin/hotels");
+                                                    break;
+                                                default:
+                                                    response.sendRedirect("/login");
+                                                    break;
+                                            }
+                                        }
+                                )
                                 .failureForwardUrl("/login?error=true")
                 )
                 .logout(logout ->
@@ -76,7 +93,8 @@ public class SecurityConfig {
                                 .sessionFixation().migrateSession()
                                 .maximumSessions(1)
                                 .maxSessionsPreventsLogin(false)
-                ).userDetailsService(userService)
+                )
+                .userDetailsService(userService)
         ;
         return httpSecurity.build();
     }
