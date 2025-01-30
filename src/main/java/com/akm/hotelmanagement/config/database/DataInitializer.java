@@ -29,6 +29,11 @@ public class DataInitializer {
 
     @Bean
     public CommandLineRunner loadData() {
+        // load only if empty
+        if (userRepository.count() > 0 || amenityRepository.count() > 0 || hotelRepository.count() > 0 || roomRepository.count() > 0 || reservationRepository.count() > 0) {
+            return args -> {
+            };
+        }
 //        userRepository.deleteAll();
 //        amenityRepository.deleteAll();
 //        hotelRepository.deleteAll();
