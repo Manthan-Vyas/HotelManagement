@@ -317,10 +317,10 @@ public class HotelAdminController {
     }
 
     private boolean isNotValidHotelRoom(Long hotelId, Long roomId) {
-        return !roomService.getRoomById(roomId).getHotel().getId().equals(hotelId);
+        return !roomService.getRoomById(roomId).getHotelId().equals(hotelId);
     }
     private boolean isNotValidHotelRoomReservation(Long hotelId, Long roomId, Long reservationId) {
-        return !roomService.getRoomById(roomId).getHotel().getId().equals(hotelId) ||
-                !reservationService.getReservationById(reservationId).getRoom().getId().equals(roomId);
+        return !roomService.getRoomById(roomId).getHotelId().equals(hotelId) ||
+                !reservationService.getReservationById(reservationId).getRoomId().equals(roomId);
     }
 }
