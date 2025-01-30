@@ -3,14 +3,25 @@ package com.akm.hotelmanagement.mapper;
 import com.akm.hotelmanagement.dto.user.CreateUserRequestDto;
 import com.akm.hotelmanagement.dto.user.UpdateUserRequestDto;
 import com.akm.hotelmanagement.dto.user.UserResponseDto;
+import com.akm.hotelmanagement.entity.Reservation;
 import com.akm.hotelmanagement.entity.User;
+import com.akm.hotelmanagement.repository.ReservationRepository;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+@Component
+@RequiredArgsConstructor
 public class UserMapper {
-    public static CreateUserRequestDto toCreateDto(@NotNull User user) {
+
+    private final ReservationRepository reservationRepository;
+
+    public CreateUserRequestDto toCreateDto(@NotNull User user) {
         return new CreateUserRequestDto(
                 user.getName(),
                 user.getEmail(),
@@ -20,7 +31,7 @@ public class UserMapper {
         );
     }
 
-    public static UpdateUserRequestDto toUpdateDto(@NotNull User user) {
+    public UpdateUserRequestDto toUpdateDto(@NotNull User user) {
         return new UpdateUserRequestDto(
                 user.getName(),
                 user.getEmail(),
@@ -30,18 +41,18 @@ public class UserMapper {
         );
     }
 
-    public static UserResponseDto toResponseDto(@NotNull User user) {
+    public UserResponseDto toResponseDto(@NotNull User user) {
         return new UserResponseDto(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getUsername(),
                 user.getPhone(),
-                user.getReservations().stream().map(ReservationMapper::toResponseDto).collect(Collectors.toSet())
+                user.getReservations().stream().map(Reservation::getId).collect(Collectors.toSet())
         );
     }
 
-    public static User toEntity(@NotNull CreateUserRequestDto userDTO) {
+    public User toEntity(@NotNull CreateUserRequestDto userDTO) {
         User user = new User();
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
@@ -51,7 +62,7 @@ public class UserMapper {
         return user;
     }
 
-    public static User toEntity(@NotNull UpdateUserRequestDto userDTO, @Nullable User user) {
+    public User toEntity(@NotNull UpdateUserRequestDto userDTO, @Nullable User user) {
         if (user == null) {
             user = new User();
         }
@@ -73,14 +84,15 @@ public class UserMapper {
         return user;
     }
 
-    public static User toEntity(@NotNull UserResponseDto userDTO) {
+    public User toEntity(@NotNull UserResponseDto userDTO) {
         User user = new User();
         user.setId(userDTO.getId());
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
         user.setUsername(userDTO.getUsername());
         user.setPhone(userDTO.getPhone());
-        user.setReservations(userDTO.getReservations().stream().map(ReservationMapper::toEntity).collect(Collectors.toSet()));
+        Set<Reservation> reservations = userDTO.getReservationIds().stream().map(reservationRepository::findById).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+        user.setReservations(reservations);
         return user;
     }
 }

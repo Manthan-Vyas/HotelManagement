@@ -3,15 +3,28 @@ package com.akm.hotelmanagement.mapper;
 import com.akm.hotelmanagement.dto.hotel.CreateHotelRequestDto;
 import com.akm.hotelmanagement.dto.hotel.UpdateHotelRequestDto;
 import com.akm.hotelmanagement.dto.hotel.HotelResponseDto;
+import com.akm.hotelmanagement.entity.Amenity;
 import com.akm.hotelmanagement.entity.Hotel;
+import com.akm.hotelmanagement.entity.Room;
+import com.akm.hotelmanagement.repository.AmenityRepository;
+import com.akm.hotelmanagement.repository.RoomRepository;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+@Component
+@RequiredArgsConstructor
 public class HotelMapper {
 
-    public static CreateHotelRequestDto toCreateDto(@NotNull Hotel hotel) {
+    private final RoomRepository roomRepository;
+    private final AmenityRepository amenityRepository;
+
+    public CreateHotelRequestDto toCreateDto(@NotNull Hotel hotel) {
         return new CreateHotelRequestDto(
                 hotel.getName(),
                 hotel.getAddress(),
@@ -24,7 +37,7 @@ public class HotelMapper {
         );
     }
 
-    public static UpdateHotelRequestDto toUpdateDto(@NotNull Hotel hotel) {
+    public UpdateHotelRequestDto toUpdateDto(@NotNull Hotel hotel) {
         return new UpdateHotelRequestDto(
                 hotel.getName(),
                 hotel.getAddress(),
@@ -37,7 +50,7 @@ public class HotelMapper {
         );
     }
 
-    public static HotelResponseDto toResponseDto(@NotNull Hotel hotel) {
+    public HotelResponseDto toResponseDto(@NotNull Hotel hotel) {
         return new HotelResponseDto(
                 hotel.getId(),
                 hotel.getName(),
@@ -48,12 +61,12 @@ public class HotelMapper {
                 hotel.getDescription(),
                 hotel.getRating(),
                 hotel.getImageUrls(),
-                hotel.getRooms().stream().map(RoomMapper::toResponseDto).collect(Collectors.toSet()),
-                hotel.getAmenities().stream().map(AmenityMapper::toResponseDto).collect(Collectors.toSet())
+                hotel.getRooms().stream().map(Room::getId).collect(Collectors.toSet()),
+                hotel.getAmenities().stream().map(Amenity::getId).collect(Collectors.toSet())
         );
     }
 
-    public static Hotel toEntity(@NotNull CreateHotelRequestDto hotelDTO) {
+    public Hotel toEntity(@NotNull CreateHotelRequestDto hotelDTO) {
         Hotel hotel = new Hotel();
         hotel.setName(hotelDTO.getName());
         hotel.setAddress(hotelDTO.getAddress());
@@ -66,7 +79,7 @@ public class HotelMapper {
         return hotel;
     }
 
-    public static Hotel toEntity(@NotNull UpdateHotelRequestDto hotelDTO, @Nullable Hotel hotel) {
+    public Hotel toEntity(@NotNull UpdateHotelRequestDto hotelDTO, @Nullable Hotel hotel) {
         if (hotel == null) {
             hotel = new Hotel();
         }
@@ -97,7 +110,7 @@ public class HotelMapper {
         return hotel;
     }
 
-    public static Hotel toEntity(@NotNull HotelResponseDto hotelDTO) {
+    public Hotel toEntity(@NotNull HotelResponseDto hotelDTO) {
         Hotel hotel = new Hotel();
         hotel.setId(hotelDTO.getId());
         hotel.setName(hotelDTO.getName());
@@ -108,8 +121,10 @@ public class HotelMapper {
         hotel.setDescription(hotelDTO.getDescription());
         hotel.setRating(hotelDTO.getRating());
         hotel.setImageUrls(hotelDTO.getImageUrls());
-        hotel.setRooms(hotelDTO.getRooms().stream().map(RoomMapper::toEntity).collect(Collectors.toSet()));
-        hotel.setAmenities(hotelDTO.getAmenities().stream().map(AmenityMapper::toEntity).collect(Collectors.toSet()));
+        Set<Room> rooms = hotelDTO.getRoomIds().stream().map(roomRepository::findById).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+        hotel.setRooms(rooms);
+        Set<Amenity> amenities = hotelDTO.getAmenityIds().stream().map(amenityRepository::findById).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+        hotel.setAmenities(amenities);
         return hotel;
     }
 }

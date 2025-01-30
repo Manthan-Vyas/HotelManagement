@@ -3,15 +3,27 @@ package com.akm.hotelmanagement.mapper;
 import com.akm.hotelmanagement.dto.room.CreateHotelRoomRequestDto;
 import com.akm.hotelmanagement.dto.room.UpdateHotelRoomRequestDto;
 import com.akm.hotelmanagement.dto.room.RoomResponseDto;
+import com.akm.hotelmanagement.entity.Reservation;
 import com.akm.hotelmanagement.entity.Room;
+import com.akm.hotelmanagement.repository.HotelRepository;
+import com.akm.hotelmanagement.repository.ReservationRepository;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+@Component
+@RequiredArgsConstructor
 public class RoomMapper {
 
-    public static CreateHotelRoomRequestDto toCreateDto(@NotNull Room room) {
+    private final HotelRepository hotelRepository;
+    private final ReservationRepository reservationRepository;
+
+    public CreateHotelRoomRequestDto toCreateDto(@NotNull Room room) {
         return new CreateHotelRoomRequestDto(
                 room.getNumber(),
                 room.getType(),
@@ -22,7 +34,7 @@ public class RoomMapper {
         );
     }
 
-    public static UpdateHotelRoomRequestDto toUpdateDto(@NotNull Room room) {
+    public UpdateHotelRoomRequestDto toUpdateDto(@NotNull Room room) {
         return new UpdateHotelRoomRequestDto(
                 room.getNumber(),
                 room.getType(),
@@ -34,7 +46,7 @@ public class RoomMapper {
         );
     }
 
-    public static RoomResponseDto toResponseDto(@NotNull Room room) {
+    public RoomResponseDto toResponseDto(@NotNull Room room) {
         return new RoomResponseDto(
                 room.getId(),
                 room.getNumber(),
@@ -44,12 +56,12 @@ public class RoomMapper {
                 room.getPricePerNight(),
                 room.getStatus(),
                 room.getImageUrls(),
-                HotelMapper.toResponseDto(room.getHotel()),
-                room.getReservations().stream().map(ReservationMapper::toResponseDto).collect(Collectors.toSet())
+                room.getHotel().getId(),
+                room.getReservations().stream().map(Reservation::getId).collect(Collectors.toSet())
         );
     }
 
-    public static Room toEntity(@NotNull CreateHotelRoomRequestDto roomDTO) {
+    public Room toEntity(@NotNull CreateHotelRoomRequestDto roomDTO) {
         Room room = new Room();
         room.setNumber(roomDTO.getNumber());
         room.setType(roomDTO.getType());
@@ -60,7 +72,7 @@ public class RoomMapper {
         return room;
     }
 
-    public static Room toEntity(@NotNull UpdateHotelRoomRequestDto roomDTO, @Nullable Room room) {
+    public Room toEntity(@NotNull UpdateHotelRoomRequestDto roomDTO, @Nullable Room room) {
         if (room == null) {
             room = new Room();
         }
@@ -86,7 +98,7 @@ public class RoomMapper {
         return room;
     }
 
-    public static Room toEntity(@NotNull RoomResponseDto roomDTO) {
+    public Room toEntity(@NotNull RoomResponseDto roomDTO) {
         Room room = new Room();
         room.setId(roomDTO.getId());
         room.setNumber(roomDTO.getNumber());
@@ -96,8 +108,11 @@ public class RoomMapper {
         room.setPricePerNight(roomDTO.getPricePerNight());
         room.setStatus(roomDTO.getStatus());
         room.setImageUrls(roomDTO.getImageUrls());
-        room.setHotel(HotelMapper.toEntity(roomDTO.getHotel()));
-        room.setReservations(roomDTO.getReservations().stream().map(ReservationMapper::toEntity).collect(Collectors.toSet()));
+        room.setHotel(hotelRepository.findById(roomDTO.getHotelId()).orElseThrow(
+                () -> new IllegalArgumentException("Hotel with id " + roomDTO.getHotelId() + " not found")
+        ));
+        Set<Reservation> reservations = roomDTO.getReservationIds().stream().map(reservationRepository::findById).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+        room.setReservations(reservations);
         return room;
     }
 }
