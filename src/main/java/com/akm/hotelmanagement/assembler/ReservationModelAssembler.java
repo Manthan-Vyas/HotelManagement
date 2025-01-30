@@ -22,8 +22,8 @@ public class ReservationModelAssembler extends RepresentationModelAssemblerSuppo
         ReservationModel reservationModel = new ReservationModel(dto);
         reservationModel.add(
                 linkTo(methodOn(AdminController.class).getReservationDetails(dto.getId(), null)).withSelfRel(),
-                linkTo(methodOn(AdminController.class).getUserDetails(dto.getUser().getUsername(), null)).withRel("user"),
-                linkTo(methodOn(AdminController.class).getRoomDetails(dto.getRoom().getId(), null)).withRel("room")
+                linkTo(methodOn(AdminController.class).getUserDetails(dto.getUsername(), null)).withRel("user"),
+                linkTo(methodOn(AdminController.class).getRoomDetails(dto.getRoomId(), null)).withRel("room")
         );
         return reservationModel;
     }
