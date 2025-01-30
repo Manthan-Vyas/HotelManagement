@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
+import java.nio.channels.FileChannel;
+
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
@@ -150,5 +152,15 @@ public class HotelService {
         if (dto.getImageUrls() != null) {
             hotel.setImageUrls(dto.getImageUrls());
         }
+    }
+
+    public Page<HotelResponseDto> getAmenityHotels(Long amenityId, Pageable pageable, String filterBy, String filterValue) {
+        return hotelRepository.findAll(
+                where(
+                        HotelSpecifications.hasAmenity(amenityId.toString())
+                                .and(HotelSpecifications.hasFilter(filterBy, filterValue))
+                ),
+                pageable
+        ).map(hotelMapper::toResponseDto);
     }
 }

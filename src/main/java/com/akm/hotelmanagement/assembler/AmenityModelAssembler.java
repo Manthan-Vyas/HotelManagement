@@ -24,7 +24,8 @@ public class AmenityModelAssembler extends RepresentationModelAssemblerSupport<A
                 linkTo(methodOn(AdminController.class).getAmenityDetails(dto.getId(), null)).withSelfRel(),
                 linkTo(methodOn(AdminController.class).getAllAmenities(
                         0, 10, "name", "asc", null, null, null
-                )).withRel("allAmenities")
+                )).withRel("allAmenities"),
+                linkTo(methodOn(AdminController.class).getAmenityHotels(dto.getId(), 0, 10, "name", "asc", null, null, null)).withRel("hotels")
         );
         return amenityModel;
     }

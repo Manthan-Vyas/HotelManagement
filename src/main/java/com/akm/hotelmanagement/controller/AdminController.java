@@ -459,4 +459,31 @@ public class AdminController {
                 )
         );
     }
+
+    @GetMapping("/amenities/{amenityId}/hotels")
+    public ResponseEntity<ResponseWrapper<PagedResponse<HotelModel>>> getAmenityHotels(
+            @PathVariable Long amenityId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(required = false) String filterBy,
+            @RequestParam(required = false) String filterValue,
+            @Nullable HttpServletRequest request
+    ) {
+        Page<HotelModel> responseData = hotelService.getAmenityHotels(
+                amenityId,
+                getPageable(page, size, sortBy, sortDir),
+                filterBy,
+                filterValue
+        ).map(hotelModelAssembler::toModel);
+        if (responseData.isEmpty()) {
+            return ResponseEntity.ok(
+                    ResponseWrapper.getNoContentResponseWrapper(request)
+            );
+        }
+        return ResponseEntity.ok(
+                ResponseWrapper.getOkResponseWrapperPaged(responseData, request)
+        );
+    }
 }
