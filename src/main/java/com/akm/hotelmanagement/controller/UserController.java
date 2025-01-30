@@ -249,6 +249,6 @@ public class UserController {
     }
 
     private boolean isNotValidUserReservation(String username, Long reservationId) {
-        return !isAuthenticatedUser(username) || !reservationService.getReservationById(reservationId).getUser().getUsername().equals(username);
+        return !isAuthenticatedUser(username) || !reservationService.getReservationById(reservationId).getUsername().equals(username);
     }
 }

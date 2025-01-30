@@ -6,7 +6,9 @@ import com.akm.hotelmanagement.entity.Hotel;
 import com.akm.hotelmanagement.entity.Reservation;
 import com.akm.hotelmanagement.entity.Room;
 import com.akm.hotelmanagement.entity.User;
+import com.akm.hotelmanagement.entity.util.ReservationStatus;
 import com.akm.hotelmanagement.exception.ResourceNotFoundException;
+import com.akm.hotelmanagement.mapper.ReservationMapper;
 import com.akm.hotelmanagement.repository.ReservationRepository;
 import com.akm.hotelmanagement.repository.RoomRepository;
 import com.akm.hotelmanagement.repository.UserRepository;
@@ -29,6 +31,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,6 +45,9 @@ class ReservationServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ReservationMapper reservationMapper;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -84,11 +90,12 @@ class ReservationServiceTest {
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+        when(reservationMapper.toResponseDto(any(Reservation.class))).thenReturn(new ReservationResponseDto(1L, LocalDate.now(), LocalDate.now().plusDays(1), 4, 100.0, LocalDate.now(), ReservationStatus.PENDING, "username", 1L));
 
         ReservationResponseDto response = reservationService.createReservation(createReservationRequestDto, "testuser", 1L);
 
         assertNotNull(response);
-        assertEquals(101, response.getRoom().getNumber());
+        assertEquals(1L, response.getRoomId());
         verify(reservationRepository, times(1)).save(any(Reservation.class));
     }
 
@@ -110,11 +117,12 @@ class ReservationServiceTest {
     @Test
     void testGetReservationById() {
         when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
+        when(reservationMapper.toResponseDto(any(Reservation.class))).thenReturn(new ReservationResponseDto(1L, LocalDate.now(), LocalDate.now().plusDays(1), 4, 100.0, LocalDate.now(), ReservationStatus.PENDING, "username", 1L));
 
         ReservationResponseDto response = reservationService.getReservationById(1L);
 
         assertNotNull(response);
-        assertEquals(101, response.getRoom().getNumber());
+        assertEquals(1L, response.getRoomId());
     }
 
     @Test
@@ -129,6 +137,7 @@ class ReservationServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Reservation> reservationPage = new PageImpl<>(Collections.singletonList(reservation));
         when(reservationRepository.findAll(any(Pageable.class))).thenReturn(reservationPage);
+        when(reservationMapper.toResponseDto(any(Reservation.class))).thenReturn(new ReservationResponseDto(1L, LocalDate.now(), LocalDate.now().plusDays(1), 4, 100.0, LocalDate.now(), ReservationStatus.PENDING, "username", 1L));
 
         Page<ReservationResponseDto> response = reservationService.getAllReservations(pageable, null, null);
 
@@ -140,11 +149,12 @@ class ReservationServiceTest {
     void testUpdateReservation() {
         when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+        when(reservationMapper.toResponseDto(any(Reservation.class))).thenReturn(new ReservationResponseDto(1L, LocalDate.now(), LocalDate.now().plusDays(1), 4, 100.0, LocalDate.now(), ReservationStatus.PENDING, "username", 1L));
 
         ReservationResponseDto response = reservationService.updateReservation(1L, updateReservationRequestDto);
 
         assertNotNull(response);
-        assertEquals(101, response.getRoom().getNumber());
+        assertEquals(1L, response.getRoomId());
         verify(reservationRepository, times(1)).save(any(Reservation.class));
     }
 

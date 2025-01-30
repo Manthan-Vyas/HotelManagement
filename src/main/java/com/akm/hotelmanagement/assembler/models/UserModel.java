@@ -6,10 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
-
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -21,7 +18,6 @@ public class UserModel extends RepresentationModel<UserModel> {
     private String email;
     private String username;
     private String phone;
-    private Set<ReservationModel> reservations;
 
     public UserModel(UserResponseDto dto) {
         this(
@@ -29,8 +25,7 @@ public class UserModel extends RepresentationModel<UserModel> {
                 dto.getName(),
                 dto.getEmail(),
                 dto.getUsername(),
-                dto.getPhone(),
-                dto.getReservations().stream().map(ReservationModel::new).collect(Collectors.toSet())
+                dto.getPhone()
         );
     }
 }

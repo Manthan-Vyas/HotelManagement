@@ -4,13 +4,26 @@ import com.akm.hotelmanagement.dto.hotel.CreateHotelRequestDto;
 import com.akm.hotelmanagement.dto.hotel.HotelResponseDto;
 import com.akm.hotelmanagement.dto.hotel.UpdateHotelRequestDto;
 import com.akm.hotelmanagement.entity.Hotel;
+import com.akm.hotelmanagement.repository.AmenityRepository;
+import com.akm.hotelmanagement.repository.RoomRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HotelMapperTest {
+
+    private HotelMapper hotelMapper;
+
+    @BeforeEach
+    void setUp() {
+        RoomRepository roomRepository = Mockito.mock(RoomRepository.class);
+        AmenityRepository amenityRepository = Mockito.mock(AmenityRepository.class);
+        hotelMapper = new HotelMapper(roomRepository, amenityRepository);
+    }
 
     @Test
     void testToCreateDto() {
@@ -24,7 +37,7 @@ public class HotelMapperTest {
         hotel.setRating(5);
         hotel.setImageUrls(new HashSet<>());
 
-        CreateHotelRequestDto dto = HotelMapper.toCreateDto(hotel);
+        CreateHotelRequestDto dto = hotelMapper.toCreateDto(hotel);
 
         assertEquals(hotel.getName(), dto.getName());
         assertEquals(hotel.getAddress(), dto.getAddress());
@@ -48,7 +61,7 @@ public class HotelMapperTest {
         hotel.setRating(5);
         hotel.setImageUrls(new HashSet<>());
 
-        UpdateHotelRequestDto dto = HotelMapper.toUpdateDto(hotel);
+        UpdateHotelRequestDto dto = hotelMapper.toUpdateDto(hotel);
 
         assertEquals(hotel.getName(), dto.getName());
         assertEquals(hotel.getAddress(), dto.getAddress());
@@ -75,7 +88,7 @@ public class HotelMapperTest {
         hotel.setRooms(new HashSet<>());
         hotel.setAmenities(new HashSet<>());
 
-        HotelResponseDto dto = HotelMapper.toResponseDto(hotel);
+        HotelResponseDto dto = hotelMapper.toResponseDto(hotel);
 
         assertEquals(hotel.getId(), dto.getId());
         assertEquals(hotel.getName(), dto.getName());
@@ -86,8 +99,8 @@ public class HotelMapperTest {
         assertEquals(hotel.getDescription(), dto.getDescription());
         assertEquals(hotel.getRating(), dto.getRating());
         assertEquals(hotel.getImageUrls(), dto.getImageUrls());
-        assertEquals(hotel.getRooms().size(), dto.getRooms().size());
-        assertEquals(hotel.getAmenities().size(), dto.getAmenities().size());
+        assertEquals(hotel.getRooms().size(), dto.getRoomIds().size());
+        assertEquals(hotel.getAmenities().size(), dto.getAmenityIds().size());
     }
 
     @Test
@@ -103,7 +116,7 @@ public class HotelMapperTest {
                 new HashSet<>()
         );
 
-        Hotel hotel = HotelMapper.toEntity(dto);
+        Hotel hotel = hotelMapper.toEntity(dto);
 
         assertEquals(dto.getName(), hotel.getName());
         assertEquals(dto.getAddress(), hotel.getAddress());
@@ -138,7 +151,7 @@ public class HotelMapperTest {
         hotel.setRating(3);
         hotel.setImageUrls(new HashSet<>());
 
-        Hotel updatedHotel = HotelMapper.toEntity(dto, hotel);
+        Hotel updatedHotel = hotelMapper.toEntity(dto, hotel);
 
         assertEquals(dto.getName(), updatedHotel.getName());
         assertEquals(dto.getAddress(), updatedHotel.getAddress());
@@ -166,7 +179,7 @@ public class HotelMapperTest {
                 new HashSet<>()
         );
 
-        Hotel hotel = HotelMapper.toEntity(dto);
+        Hotel hotel = hotelMapper.toEntity(dto);
 
         assertEquals(dto.getId(), hotel.getId());
         assertEquals(dto.getName(), hotel.getName());
@@ -177,7 +190,7 @@ public class HotelMapperTest {
         assertEquals(dto.getDescription(), hotel.getDescription());
         assertEquals(dto.getRating(), hotel.getRating());
         assertEquals(dto.getImageUrls(), hotel.getImageUrls());
-        assertEquals(dto.getRooms().size(), hotel.getRooms().size());
-        assertEquals(dto.getAmenities().size(), hotel.getAmenities().size());
+        assertEquals(dto.getRoomIds().size(), hotel.getRooms().size());
+        assertEquals(dto.getAmenityIds().size(), hotel.getAmenities().size());
     }
 }

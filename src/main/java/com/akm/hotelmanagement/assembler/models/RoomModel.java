@@ -24,8 +24,6 @@ public class RoomModel extends RepresentationModel<RoomModel> {
     private double pricePerNight;
     private RoomStatus status;
     private Set<String> imageUrls;
-    private HotelModel hotel;
-    private Set<ReservationModel> reservations;
 
     public RoomModel(RoomResponseDto dto) {
         this(
@@ -36,9 +34,7 @@ public class RoomModel extends RepresentationModel<RoomModel> {
                 dto.getCapacity(),
                 dto.getPricePerNight(),
                 dto.getStatus(),
-                dto.getImageUrls(),
-                new HotelModel(dto.getHotel()),
-                dto.getReservations().stream().map(ReservationModel::new).collect(Collectors.toSet())
+                dto.getImageUrls()
         );
     }
 }

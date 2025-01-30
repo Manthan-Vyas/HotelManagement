@@ -20,7 +20,10 @@ import static org.springframework.data.jpa.domain.Specification.where;
 @Service
 @RequiredArgsConstructor
 public class AmenityService {
+
     private final AmenityRepository amenityRepository;
+
+    private final AmenityMapper amenityMapper;
 
     public AmenityResponseDto createAmenity(CreateAmenityRequestDto dto) {
         if (amenityRepository.existsByName(dto.getName())) {
@@ -29,11 +32,11 @@ public class AmenityService {
                     "Amenity with name: " + dto.getName() + " already exists"
             );
         }
-        return AmenityMapper.toResponseDto(amenityRepository.save(AmenityMapper.toEntity(dto)));
+        return amenityMapper.toResponseDto(amenityRepository.save(amenityMapper.toEntity(dto)));
     }
 
     public AmenityResponseDto getAmenityById(Long id) {
-        return AmenityMapper.toResponseDto(
+        return amenityMapper.toResponseDto(
                 amenityRepository.findById(id)
                         .orElseThrow(() -> new ResourceNotFoundException("Amenity not found with id: " + id)));
     }
@@ -41,12 +44,12 @@ public class AmenityService {
     public Page<AmenityResponseDto> getAllAmenities(Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return amenityRepository.findAll(pageable)
-                    .map(AmenityMapper::toResponseDto);
+                    .map(amenityMapper::toResponseDto);
         }
         return amenityRepository.findAll(
                 where(AmenitySpecifications.hasFilter(filterBy, filterValue)),
                 pageable
-        ).map(AmenityMapper::toResponseDto);
+        ).map(amenityMapper::toResponseDto);
     }
 
     public Page<AmenityResponseDto> getAmenitiesByHotelId(Long hotelId, Pageable pageable) {
@@ -58,7 +61,7 @@ public class AmenityService {
                         )
                 ),
                 pageable
-        ).map(AmenityMapper::toResponseDto);
+        ).map(amenityMapper::toResponseDto);
     }
 
     public Page<AmenityResponseDto> getAmenitiesByRoomId(Long roomId, Pageable pageable) {
@@ -70,7 +73,7 @@ public class AmenityService {
                         )
                 ),
                 pageable
-        ).map(AmenityMapper::toResponseDto);
+        ).map(amenityMapper::toResponseDto);
     }
 
     public AmenityResponseDto updateAmenity(Long id, UpdateAmenityRequestDto dto, boolean isPut) {
@@ -107,11 +110,11 @@ public class AmenityService {
             if (dto.getDescription() != null) {
                 amenity.setDescription(dto.getDescription());
             }
-            return AmenityMapper.toResponseDto(amenityRepository.save(amenity));
+            return amenityMapper.toResponseDto(amenityRepository.save(amenity));
         }
         amenity.setName(dto.getName());
         amenity.setDescription(dto.getDescription());
-        return AmenityMapper.toResponseDto(amenityRepository.save(amenity));
+        return amenityMapper.toResponseDto(amenityRepository.save(amenity));
     }
 
     public void deleteAmenity(Long id) {

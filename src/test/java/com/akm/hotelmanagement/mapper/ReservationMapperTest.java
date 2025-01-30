@@ -1,24 +1,36 @@
 package com.akm.hotelmanagement.mapper;
 
-import com.akm.hotelmanagement.dto.hotel.HotelResponseDto;
 import com.akm.hotelmanagement.dto.reservation.CreateOrUpdateUserRoomReservationRequestDto;
 import com.akm.hotelmanagement.dto.reservation.ReservationResponseDto;
-import com.akm.hotelmanagement.dto.room.RoomResponseDto;
-import com.akm.hotelmanagement.dto.user.UserResponseDto;
 import com.akm.hotelmanagement.entity.Reservation;
 import com.akm.hotelmanagement.entity.Room;
+import com.akm.hotelmanagement.entity.User;
 import com.akm.hotelmanagement.entity.util.ReservationStatus;
-import com.akm.hotelmanagement.entity.util.RoomStatus;
+import com.akm.hotelmanagement.repository.RoomRepository;
+import com.akm.hotelmanagement.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.Optional;
 
 import static com.akm.hotelmanagement.util.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 public class ReservationMapperTest {
+
+    private ReservationMapper reservationMapper;
+    private UserRepository userRepository;
+    private RoomRepository roomRepository;
+
+    @BeforeEach
+    void setUp() {
+        userRepository = Mockito.mock(UserRepository.class);
+        roomRepository = Mockito.mock(RoomRepository.class);
+        reservationMapper = new ReservationMapper(userRepository, roomRepository);
+    }
 
     @Test
     void testToCreateDto() {
@@ -27,7 +39,7 @@ public class ReservationMapperTest {
         reservation.setCheckOut(LocalDate.of(2023, 1, 10));
         reservation.setNumberOfGuests(2);
 
-        CreateOrUpdateUserRoomReservationRequestDto dto = ReservationMapper.toCreateDto(reservation);
+        CreateOrUpdateUserRoomReservationRequestDto dto = reservationMapper.toCreateDto(reservation);
 
         assertEquals(reservation.getCheckIn(), dto.getCheckIn());
         assertEquals(reservation.getCheckOut(), dto.getCheckOut());
@@ -41,7 +53,7 @@ public class ReservationMapperTest {
         reservation.setCheckOut(LocalDate.of(2023, 1, 10));
         reservation.setNumberOfGuests(2);
 
-        CreateOrUpdateUserRoomReservationRequestDto dto = ReservationMapper.toUpdateDto(reservation);
+        CreateOrUpdateUserRoomReservationRequestDto dto = reservationMapper.toUpdateDto(reservation);
 
         assertEquals(reservation.getCheckIn(), dto.getCheckIn());
         assertEquals(reservation.getCheckOut(), dto.getCheckOut());
@@ -63,7 +75,7 @@ public class ReservationMapperTest {
         room.setHotel(validHotel());
         reservation.setRoom(room);
 
-        ReservationResponseDto dto = ReservationMapper.toResponseDto(reservation);
+        ReservationResponseDto dto = reservationMapper.toResponseDto(reservation);
 
         assertEquals(reservation.getId(), dto.getId());
         assertEquals(reservation.getCheckIn(), dto.getCheckIn());
@@ -72,8 +84,8 @@ public class ReservationMapperTest {
         assertEquals(reservation.getTotalPrice(), dto.getTotalPrice());
         assertEquals(reservation.getReservationDate(), dto.getReservationDate());
         assertEquals(reservation.getStatus(), dto.getStatus());
-        assertEquals(reservation.getUser().getId(), dto.getUser().getId());
-        assertEquals(reservation.getRoom().getId(), dto.getRoom().getId());
+        assertEquals(reservation.getUser().getUsername(), dto.getUsername());
+        assertEquals(reservation.getRoom().getId(), dto.getRoomId());
     }
 
     @Test
@@ -84,7 +96,7 @@ public class ReservationMapperTest {
                 2
         );
 
-        Reservation reservation = ReservationMapper.toEntity(dto, null);
+        Reservation reservation = reservationMapper.toEntity(dto, null);
 
         assertEquals(dto.getCheckIn(), reservation.getCheckIn());
         assertEquals(dto.getCheckOut(), reservation.getCheckOut());
@@ -93,6 +105,16 @@ public class ReservationMapperTest {
 
     @Test
     void testToEntityFromResponseDto() {
+        User user = new User();
+        user.setUsername("username");
+        when(userRepository.save(user)).thenReturn(user);
+        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
+
+        Room room = new Room();
+        room.setId(1L);
+        when(roomRepository.save(room)).thenReturn(room);
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
+
         ReservationResponseDto dto = new ReservationResponseDto(
                 1L,
                 LocalDate.of(2023, 1, 1),
@@ -101,41 +123,11 @@ public class ReservationMapperTest {
                 1000.0,
                 LocalDate.of(2022, 12, 1),
                 ReservationStatus.CONFIRMED,
-                new UserResponseDto(
-                        UUID.randomUUID(),
-                        "name",
-                        "email@id.test",
-                        "username",
-                        "1212309310",
-                        new HashSet<>()
-                ),
-                new RoomResponseDto(
-                        1L,
-                        102,
-                        "delux",
-                        "delux room",
-                        2,
-                        200,
-                        RoomStatus.AVAILABLE,
-                        new HashSet<>(),
-                        new HotelResponseDto(
-                                1L,
-                                "hotel",
-                                "address",
-                                "city",
-                                "state",
-                                "123546",
-                                "dslkja dsakj",
-                                4.3,
-                                new HashSet<>(),
-                                new HashSet<>(),
-                                new HashSet<>()
-                        ),
-                        new HashSet<>()
-                )
+                "username",
+                1L
         );
 
-        Reservation reservation = ReservationMapper.toEntity(dto);
+        Reservation reservation = reservationMapper.toEntity(dto);
 
         assertEquals(dto.getId(), reservation.getId());
         assertEquals(dto.getCheckIn(), reservation.getCheckIn());
@@ -144,7 +136,7 @@ public class ReservationMapperTest {
         assertEquals(dto.getTotalPrice(), reservation.getTotalPrice());
         assertEquals(dto.getReservationDate(), reservation.getReservationDate());
         assertEquals(dto.getStatus(), reservation.getStatus());
-        assertEquals(dto.getUser().getId(), reservation.getUser().getId());
-        assertEquals(dto.getRoom().getId(), reservation.getRoom().getId());
+        assertEquals(dto.getUsername(), reservation.getUser().getUsername());
+        assertEquals(dto.getRoomId(), reservation.getRoom().getId());
     }
 }

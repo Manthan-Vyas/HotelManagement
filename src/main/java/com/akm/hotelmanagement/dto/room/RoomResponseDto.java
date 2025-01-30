@@ -1,11 +1,7 @@
 package com.akm.hotelmanagement.dto.room;
 
-import com.akm.hotelmanagement.dto.hotel.HotelResponseDto;
-import com.akm.hotelmanagement.dto.reservation.ReservationResponseDto;
 import com.akm.hotelmanagement.entity.Room;
 import com.akm.hotelmanagement.entity.util.RoomStatus;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Value;
 
 import java.io.Serializable;
@@ -24,8 +20,6 @@ public class RoomResponseDto implements Serializable {
     double pricePerNight;
     RoomStatus status;
     Set<String> imageUrls;
-    @JsonBackReference
-    HotelResponseDto hotel;
-    @JsonManagedReference
-    Set<ReservationResponseDto> reservations;
+    Long hotelId;
+    Set<Long> reservationIds;
 }
