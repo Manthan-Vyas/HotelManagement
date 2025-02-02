@@ -108,9 +108,17 @@ public class HotelService {
 
     @Transactional(readOnly = true)
     public Page<HotelResponseDto> getAmenityHotels(Long amenityId, Pageable pageable, String filterBy, String filterValue) {
+        if (filterBy == null || filterValue == null) {
+            return hotelRepository.findAll(
+                    where(
+                            HotelSpecifications.hasFilter("amenity-id", amenityId.toString())
+                    ),
+                    pageable
+            ).map(hotelMapper::toResponseDto);
+        }
         return hotelRepository.findAll(
                 where(
-                        HotelSpecifications.hasAmenity(amenityId.toString())
+                        HotelSpecifications.hasFilter("amenity-id", amenityId.toString())
                                 .and(HotelSpecifications.hasFilter(filterBy, filterValue))
                 ),
                 pageable

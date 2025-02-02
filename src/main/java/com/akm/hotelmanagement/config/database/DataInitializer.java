@@ -46,25 +46,36 @@ public class DataInitializer {
             admin.setName("Admin");
             admin.setUsername("admin");
             admin.setPassword(passwordEncoder.encode("toor"));
-            admin.setRole(UserRole.ADMIN); // Assuming 1 is for ADMIN
+            admin.setRole(UserRole.ADMIN);
             admin.setEmail("admin@example.com");
             admin.setPhone("1234567890");
+            admin.setEnabled(true);
             userRepository.save(admin);
+
+            User root = new User();
+            root.setName("Root");
+            root.setUsername("root");
+            root.setPassword(passwordEncoder.encode("toor"));
+            root.setRole(UserRole.ADMIN);
+            root.setEmail("root@example.com");
+            root.setPhone("1234567891");
+            root.setEnabled(true);
+            userRepository.save(root);
 
             User hotelAdmin = new User();
             hotelAdmin.setName("Hotel Admin");
-            hotelAdmin.setUsername("hotelAdmin");
+            hotelAdmin.setUsername("hotel");
             hotelAdmin.setPassword(passwordEncoder.encode("toor"));
-            hotelAdmin.setRole(UserRole.HOTEL_ADMIN); // Assuming 2 is for HOTEL_ADMIN
+            hotelAdmin.setRole(UserRole.HOTEL_ADMIN);
             hotelAdmin.setEmail("hoteladmin@example.com");
             hotelAdmin.setPhone("0987654321");
             userRepository.save(hotelAdmin);
 
             User user = new User();
             user.setName("User");
-            user.setUsername("manthan");
+            user.setUsername("user");
             user.setPassword(passwordEncoder.encode("toor"));
-            user.setRole(UserRole.USER); // Assuming 3 is for USER
+            user.setRole(UserRole.USER);
             user.setEmail("user@example.com");
             user.setPhone("1122334455");
             userRepository.save(user);
@@ -87,86 +98,20 @@ public class DataInitializer {
 
 
             // Create Hotels
-            Hotel hotel1 = new Hotel();
-            hotel1.setName("Hotel Sunshine");
-            hotel1.setAddress("123 Sunshine St, Sunnyville");
-            hotel1.setCity("Sunnyville");
-            hotel1.setState("Sunnyland");
-            hotel1.setZip("123311");
-            hotel1.setRating(4.5);
-            hotel1.setDescription("A hotel that shines like the sun.");
-            hotel1.setImageUrls(new HashSet<>(List.of(
-                    "http://example.com/hotel1/image1.jpg",
-                    "http://example.com/hotel1/image2.jpg"
-            )));
-            hotel1.setAmenities(new HashSet<>(List.of(
-                    wifi,
-                    gym
-            )));
+            Hotel hotel1 = getHotel(wifi, gym);
             hotelRepository.save(hotel1);
 
-            Hotel hotel2 = new Hotel();
-            hotel2.setName("Hotel Moonlight");
-            hotel2.setAddress("456 Moonlight Ave, Moonville");
-            hotel2.setCity("Moonville");
-            hotel2.setState("Moonland");
-            hotel2.setZip("456622");
-            hotel2.setRating(4.2);
-            hotel2.setDescription("A hotel that shines like the moon.");
-            hotel2.setImageUrls(new HashSet<>(List.of(
-                    "http://example.com/hotel2/image1.jpg",
-                    "http://example.com/hotel2/image2.jpg"
-            )));
-            hotel2.setAmenities(new HashSet<>(List.of(
-                    wifi,
-                    pool
-            )));
+            Hotel hotel2 = getHotel2(wifi, pool);
             hotelRepository.save(hotel2);
 
             // Create Rooms
-            Room room1 = new Room();
-            room1.setHotel(hotel1);
-            room1.setNumber(101);
-            room1.setType("Deluxe");
-            room1.setPricePerNight(100.0);
-            room1.setCapacity(4);
-            room1.setStatus(RoomStatus.AVAILABLE);
-            room1.setDescription("A room that is deluxe");
-            room1.setImageUrls(new HashSet<>(List.of(
-                    "http://example.com/room1/image1.jpg",
-                    "http://example.com/room1/image2.jpg"
-            )));
-            room1.setHotel(hotel1);
+            Room room1 = getRoom(hotel1);
             roomRepository.save(room1);
 
-            Room room2 = new Room();
-            room2.setHotel(hotel1);
-            room2.setNumber(102);
-            room2.setType("Standard");
-            room2.setPricePerNight(80.0);
-            room2.setCapacity(2);
-            room2.setStatus(RoomStatus.AVAILABLE);
-            room2.setDescription("A room that is standard");
-            room2.setImageUrls(new HashSet<>(List.of(
-                    "http://example.com/room2/image1.jpg",
-                    "http://example.com/room2/image2.jpg"
-            )));
-            room2.setHotel(hotel1);
+            Room room2 = getRoom2(hotel1);
             roomRepository.save(room2);
 
-            Room room3 = new Room();
-            room3.setHotel(hotel2);
-            room3.setNumber(201);
-            room3.setType("Suite");
-            room3.setPricePerNight(150.0);
-            room3.setCapacity(6);
-            room3.setStatus(RoomStatus.AVAILABLE);
-            room3.setDescription("A room that is a suite");
-            room3.setImageUrls(new HashSet<>(List.of(
-                    "http://example.com/room3/image1.jpg",
-                    "http://example.com/room3/image2.jpg"
-            )));
-            room3.setHotel(hotel2);
+            Room room3 = getRoom3(hotel2);
             roomRepository.save(room3);
 
             // Create Reservations
@@ -191,6 +136,97 @@ public class DataInitializer {
             reservation2.setStatus(ReservationStatus.CONFIRMED);
             reservationRepository.save(reservation2);
         };
+    }
+
+    private static Room getRoom3(Hotel hotel2) {
+        Room room3 = new Room();
+        room3.setHotel(hotel2);
+        room3.setNumber(201);
+        room3.setType("Suite");
+        room3.setPricePerNight(150.0);
+        room3.setCapacity(6);
+        room3.setStatus(RoomStatus.AVAILABLE);
+        room3.setDescription("A room that is a suite");
+        room3.setImageUrls(new HashSet<>(List.of(
+                "http://example.com/room3/image1.jpg",
+                "http://example.com/room3/image2.jpg"
+        )));
+        room3.setHotel(hotel2);
+        return room3;
+    }
+
+    private static Room getRoom2(Hotel hotel1) {
+        Room room2 = new Room();
+        room2.setHotel(hotel1);
+        room2.setNumber(102);
+        room2.setType("Standard");
+        room2.setPricePerNight(80.0);
+        room2.setCapacity(2);
+        room2.setStatus(RoomStatus.AVAILABLE);
+        room2.setDescription("A room that is standard");
+        room2.setImageUrls(new HashSet<>(List.of(
+                "http://example.com/room2/image1.jpg",
+                "http://example.com/room2/image2.jpg"
+        )));
+        room2.setHotel(hotel1);
+        return room2;
+    }
+
+    private static Room getRoom(Hotel hotel1) {
+        Room room1 = new Room();
+        room1.setHotel(hotel1);
+        room1.setNumber(101);
+        room1.setType("Deluxe");
+        room1.setPricePerNight(100.0);
+        room1.setCapacity(4);
+        room1.setStatus(RoomStatus.AVAILABLE);
+        room1.setDescription("A room that is deluxe");
+        room1.setImageUrls(new HashSet<>(List.of(
+                "http://example.com/room1/image1.jpg",
+                "http://example.com/room1/image2.jpg"
+        )));
+        room1.setHotel(hotel1);
+        return room1;
+    }
+
+    private static Hotel getHotel2(Amenity wifi, Amenity pool) {
+        Hotel hotel2 = new Hotel();
+        hotel2.setName("Hotel Moonlight");
+        hotel2.setAddress("456 Moonlight Ave, Moonville");
+        hotel2.setCity("Moonville");
+        hotel2.setState("Moonland");
+        hotel2.setZip("456622");
+        hotel2.setRating(4.2);
+        hotel2.setDescription("A hotel that shines like the moon.");
+        hotel2.setImageUrls(new HashSet<>(List.of(
+                "http://example.com/hotel2/image1.jpg",
+                "http://example.com/hotel2/image2.jpg"
+        )));
+        hotel2.setAmenities(new HashSet<>(List.of(
+                wifi,
+                pool
+        )));
+        return hotel2;
+    }
+
+    private static Hotel getHotel(Amenity wifi, Amenity gym) {
+        Hotel hotel1 = new Hotel();
+        hotel1.setName("Hotel Sunshine");
+        hotel1.setAddress("123 Sunshine St, Sunnyville");
+        hotel1.setCity("Sunnyville");
+        hotel1.setState("Sunnyland");
+        hotel1.setZip("123311");
+        hotel1.setRating(4.5);
+        hotel1.setDescription("A hotel that shines like the sun.");
+        hotel1.setImageUrls(new HashSet<>(List.of(
+                "http://example.com/hotel1/image1.jpg",
+                "http://example.com/hotel1/image2.jpg"
+        )));
+        hotel1.setAmenities(new HashSet<>(List.of(
+                wifi,
+                gym
+        )));
+        return hotel1;
     }
 
 }

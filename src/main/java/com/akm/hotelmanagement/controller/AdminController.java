@@ -180,7 +180,7 @@ public class AdminController {
     public ResponseEntity<ResponseWrapper<PagedResponse<RoomModel>>> getAllRooms(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "number") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(required = false) String filterBy,
             @RequestParam(required = false) String filterValue,
@@ -232,7 +232,7 @@ public class AdminController {
     public ResponseEntity<ResponseWrapper<PagedResponse<ReservationModel>>> getAllReservations(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "checkInDate") String sortBy,
+            @RequestParam(defaultValue = "checkIn") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(required = false) String filterBy,
             @RequestParam(required = false) String filterValue,

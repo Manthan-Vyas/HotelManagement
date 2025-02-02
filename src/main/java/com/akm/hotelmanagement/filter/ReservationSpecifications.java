@@ -17,6 +17,7 @@ public class ReservationSpecifications {
             return switch (filterBy.toLowerCase()) {
                 case "id" -> criteriaBuilder.equal(root.get("id"), Long.parseLong(filterValue));
                 case "room-id" -> criteriaBuilder.equal(root.get("room").get("id"), Long.parseLong(filterValue));
+                case "hotel-id" -> criteriaBuilder.equal(root.get("room").get("hotel").get("id"), Long.parseLong(filterValue));
                 case "user-id" -> criteriaBuilder.equal(root.get("user").get("id"), UUID.fromString(filterValue));
                 case "username" -> criteriaBuilder.like(criteriaBuilder.lower(root.get("user").get("username")), "%" + filterValue.toLowerCase() + "%");
                 case "check-in" -> criteriaBuilder.equal(root.get("checkIn"), LocalDate.parse(filterValue));

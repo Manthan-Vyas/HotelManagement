@@ -84,8 +84,10 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public Page<ReservationResponseDto> getAllUserReservations(String username, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
-            return reservationRepository.findAll(pageable)
-                    .map(reservationMapper::toResponseDto);
+            return reservationRepository.findAll(
+                    where(ReservationSpecifications.hasFilter("username", username)),
+                    pageable
+                    ).map(reservationMapper::toResponseDto);
         }
         return reservationRepository.findAll(
                 where(ReservationSpecifications.hasFilter("username", username))
@@ -96,11 +98,34 @@ public class ReservationService {
         ).map(reservationMapper::toResponseDto);
     }
 
+    @Transactional
+    public Page<ReservationResponseDto> getAllHotelReservations(Long id, Pageable pageable, String filterBy, String filterValue) {
+        if (filterBy == null || filterValue == null) {
+            return reservationRepository.findAll(where(
+                    ReservationSpecifications.hasFilter(
+                            "hotel-id", id.toString()
+                    )),
+                    pageable
+            ).map(reservationMapper::toResponseDto);
+        }
+        return reservationRepository.findAll(
+                where(ReservationSpecifications.hasFilter("hotel-id", id.toString()))
+                        .and(where(ReservationSpecifications.hasFilter(
+                                filterBy, filterValue
+                        ))),
+                pageable
+        ).map(reservationMapper::toResponseDto);
+    }
+
     @Transactional(readOnly = true)
     public Page<ReservationResponseDto> getAllRoomReservations (Long id, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
-            return reservationRepository.findAll(pageable)
-                    .map(reservationMapper::toResponseDto);
+            return reservationRepository.findAll(where(
+                    ReservationSpecifications.hasFilter(
+                            "room-id", id.toString()
+                    )),
+                    pageable
+            ).map(reservationMapper::toResponseDto);
         }
         return reservationRepository.findAll(
                 where(

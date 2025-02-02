@@ -20,7 +20,7 @@ public class HotelSpecifications {
                 case "city" -> criteriaBuilder.like(criteriaBuilder.lower(root.get("city")), "%" + filterValue.toLowerCase() + "%");
                 case "state" -> criteriaBuilder.like(criteriaBuilder.lower(root.get("state")), "%" + filterValue.toLowerCase() + "%");
                 case "zip" -> criteriaBuilder.equal(root.get("zip"), filterValue);
-//                case "amenity" -> criteriaBuilder.like(criteriaBuilder.lower(root.get("amenities")), "%" + filterValue.toLowerCase() + "%");
+                case "amenity-id" -> criteriaBuilder.equal(root.join("amenities").get("id"), Long.parseLong(filterValue));
                 case "rating" -> criteriaBuilder.equal(root.get("rating"), filterValue);
                 default -> throw new IllegalArgumentException("Invalid filter field: " + filterBy);
             };
