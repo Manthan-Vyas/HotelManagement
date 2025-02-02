@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
@@ -35,6 +36,7 @@ public class ReservationService {
 
     private final ReservationMapper reservationMapper;
 
+    @Transactional
     public ReservationResponseDto createReservation(CreateOrUpdateUserRoomReservationRequestDto dto, String username, Long roomId) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + roomId));
@@ -58,12 +60,14 @@ public class ReservationService {
         return reservationMapper.toResponseDto(reservationRepository.save(reservation));
     }
 
+    @Transactional(readOnly = true)
     public ReservationResponseDto getReservationById(Long id) {
         return reservationRepository.findById(id)
                 .map(reservationMapper::toResponseDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + id));
     }
 
+    @Transactional(readOnly = true)
     public Page<ReservationResponseDto> getAllReservations(Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return reservationRepository.findAll(pageable)
@@ -77,6 +81,7 @@ public class ReservationService {
         ).map(reservationMapper::toResponseDto);
     }
 
+    @Transactional(readOnly = true)
     public Page<ReservationResponseDto> getAllUserReservations(String username, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return reservationRepository.findAll(pageable)
@@ -91,6 +96,7 @@ public class ReservationService {
         ).map(reservationMapper::toResponseDto);
     }
 
+    @Transactional(readOnly = true)
     public Page<ReservationResponseDto> getAllRoomReservations (Long id, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return reservationRepository.findAll(pageable)
@@ -110,6 +116,7 @@ public class ReservationService {
         ).map(reservationMapper::toResponseDto);
     }
 
+    @Transactional
     public ReservationResponseDto updateReservation(Long id, CreateOrUpdateUserRoomReservationRequestDto dto) {
         Reservation reservation = reservationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + id));
         reservation.setCheckIn(dto.getCheckIn());
@@ -119,6 +126,7 @@ public class ReservationService {
         return reservationMapper.toResponseDto(reservationRepository.save(reservation));
     } // todo: make dtos for admin updates also?
 
+    @Transactional
     public ReservationResponseDto updateReservationStatus(Long id, ReservationStatus status) {
         Reservation reservation = reservationRepository.findById(id).orElseThrow( () ->
                 new ResourceNotFoundException("Reservation not found with id: " + id)
@@ -130,6 +138,7 @@ public class ReservationService {
         );
     }
 
+    @Transactional
     public void deleteReservation(Long id) {
         if (!reservationRepository.existsById(id)) {
             throw new ResourceNotFoundException("Reservation not found with id " + id);
@@ -137,6 +146,7 @@ public class ReservationService {
         reservationRepository.deleteById(id);
     }
 
+    @Transactional
     public ReservationResponseDto cancelReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + reservationId));

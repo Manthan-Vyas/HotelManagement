@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.springframework.data.jpa.domain.Specification.where;
@@ -25,6 +26,7 @@ public class AmenityService {
 
     private final AmenityMapper amenityMapper;
 
+    @Transactional
     public AmenityResponseDto createAmenity(CreateAmenityRequestDto dto) {
         if (amenityRepository.existsByName(dto.getName())) {
             throw new ResponseStatusException(
@@ -35,12 +37,14 @@ public class AmenityService {
         return amenityMapper.toResponseDto(amenityRepository.save(amenityMapper.toEntity(dto)));
     }
 
+    @Transactional(readOnly = true)
     public AmenityResponseDto getAmenityById(Long id) {
         return amenityMapper.toResponseDto(
                 amenityRepository.findById(id)
                         .orElseThrow(() -> new ResourceNotFoundException("Amenity not found with id: " + id)));
     }
 
+    @Transactional(readOnly = true)
     public Page<AmenityResponseDto> getAllAmenities(Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return amenityRepository.findAll(pageable)
@@ -52,6 +56,7 @@ public class AmenityService {
         ).map(amenityMapper::toResponseDto);
     }
 
+    @Transactional(readOnly = true)
     public Page<AmenityResponseDto> getAmenitiesByHotelId(Long hotelId, Pageable pageable) {
         return amenityRepository.findAll(
                 where(
@@ -64,6 +69,7 @@ public class AmenityService {
         ).map(amenityMapper::toResponseDto);
     }
 
+    @Transactional(readOnly = true)
     public Page<AmenityResponseDto> getAmenitiesByRoomId(Long roomId, Pageable pageable) {
         return amenityRepository.findAll(
                 where(
@@ -76,6 +82,7 @@ public class AmenityService {
         ).map(amenityMapper::toResponseDto);
     }
 
+    @Transactional
     public AmenityResponseDto updateAmenity(Long id, UpdateAmenityRequestDto dto, boolean isPut) {
         if (isPut && dto.hasAnyFieldNull()) {
             throw new ResponseStatusException(
@@ -117,6 +124,7 @@ public class AmenityService {
         return amenityMapper.toResponseDto(amenityRepository.save(amenity));
     }
 
+    @Transactional
     public void deleteAmenity(Long id) {
         Amenity amenity = amenityRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Amenity not found with id: " + id));

@@ -15,8 +15,8 @@ import com.akm.hotelmanagement.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
@@ -31,6 +31,7 @@ public class RoomService {
 
     private final RoomMapper roomMapper;
 
+    @Transactional
     public RoomResponseDto createRoom(CreateHotelRoomRequestDto roomCreateDto, Long hotelId) {
         if (roomRepository.existsByNumber(roomCreateDto.getNumber())) {
             throw new ResourceAlreadyExistsException("Room already exists with number: " + roomCreateDto.getNumber());
@@ -43,12 +44,14 @@ public class RoomService {
         return roomMapper.toResponseDto(roomRepository.save(room));
     }
 
+    @Transactional(readOnly = true)
     public RoomResponseDto getRoomById(Long id) {
         return roomRepository.findById(id)
                 .map(roomMapper::toResponseDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + id));
     }
 
+    @Transactional(readOnly = true)
     public RoomResponseDto getRoomByReservationId(Long reservationId) {
         return roomRepository.findAll(
                         where(RoomSpecification.hasFilter("reservation-id", reservationId.toString()))
@@ -56,6 +59,7 @@ public class RoomService {
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with reservation id: " + reservationId));
     }
 
+    @Transactional(readOnly = true)
     public RoomResponseDto getRoomByHotelIdAndRoomNumber(Long hotelId, int roomNumber) {
         return roomRepository.findAll(
                         where(
@@ -71,6 +75,7 @@ public class RoomService {
                 .map(roomMapper::toResponseDto).stream().findFirst().orElse(null);
     }
 
+    @Transactional(readOnly = true)
     public Page<RoomResponseDto> getAllRooms(Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return roomRepository.findAll(pageable)
@@ -85,6 +90,7 @@ public class RoomService {
                 .map(roomMapper::toResponseDto);
     }
 
+    @Transactional(readOnly = true)
     public Page<RoomResponseDto> getRoomsByHotelId(Long hotelId, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return roomRepository.findAll(
@@ -100,6 +106,7 @@ public class RoomService {
         ).map(roomMapper::toResponseDto);
     }
 
+    @Transactional(readOnly = true)
     public Page<RoomResponseDto> getRoomsByUsername(String username, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return roomRepository.findAll(
@@ -115,6 +122,7 @@ public class RoomService {
         ).map(roomMapper::toResponseDto);
     }
 
+    @Transactional
     public RoomResponseDto updateRoom(Long id, UpdateHotelRoomRequestDto dto, boolean isPut) {
         if (isPut && dto.hasAnyFieldNull()) {
             throw new ResponseStatusException(
@@ -147,6 +155,7 @@ public class RoomService {
         return roomMapper.toResponseDto(roomRepository.save(room));
     }
 
+    @Transactional
     public RoomResponseDto updateRoomStatus(Long id, RoomStatus status) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with Id: " + id));
@@ -154,6 +163,7 @@ public class RoomService {
         return roomMapper.toResponseDto(roomRepository.save(room));
     }
 
+    @Transactional
     public void deleteRoom(Long id) {
         if (!roomRepository.existsById(id)) {
             throw new ResourceNotFoundException("Room not found with Id " + id);

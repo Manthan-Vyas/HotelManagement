@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
@@ -28,6 +29,7 @@ public class HotelService {
     private final HotelRepository hotelRepository;
     private final HotelMapper hotelMapper;
 
+    @Transactional
     public HotelResponseDto createHotel(CreateHotelRequestDto hotelCreateDto) {
         if (hotelRepository.existsByName(hotelCreateDto.getName())) {
             throw new ResourceAlreadyExistsException("Hotel already exists with name: " + hotelCreateDto.getName());
@@ -36,12 +38,14 @@ public class HotelService {
         return hotelMapper.toResponseDto(hotelRepository.save(hotel));
     }
 
+    @Transactional(readOnly = true)
     public HotelResponseDto getHotelById(Long id) {
         return hotelRepository.findById(id)
                 .map(hotelMapper::toResponseDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id: " + id));
     }
 
+    @Transactional(readOnly = true)
     public Page<HotelResponseDto> getAllHotels(Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return hotelRepository.findAll(pageable)
@@ -59,6 +63,7 @@ public class HotelService {
                 .map(hotelMapper::toResponseDto);
     }
 
+    @Transactional
     public HotelResponseDto updateHotel(Long id, UpdateHotelRequestDto dto, boolean isPut) {
         if (isPut && dto.hasAnyFieldNull()) {
             throw new ResponseStatusException(
@@ -93,11 +98,23 @@ public class HotelService {
         return hotelMapper.toResponseDto(hotelRepository.save(hotel));
     }
 
+    @Transactional
     public void deleteHotel(Long id) {
         if (!hotelRepository.existsById(id)) {
             throw new ResourceNotFoundException("Hotel not found with Id " + id);
         }
         hotelRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<HotelResponseDto> getAmenityHotels(Long amenityId, Pageable pageable, String filterBy, String filterValue) {
+        return hotelRepository.findAll(
+                where(
+                        HotelSpecifications.hasAmenity(amenityId.toString())
+                                .and(HotelSpecifications.hasFilter(filterBy, filterValue))
+                ),
+                pageable
+        ).map(hotelMapper::toResponseDto);
     }
 
     private void checkForDuplicateFields(UpdateHotelRequestDto dto, Hotel hotel) {
@@ -152,15 +169,5 @@ public class HotelService {
         if (dto.getImageUrls() != null) {
             hotel.setImageUrls(dto.getImageUrls());
         }
-    }
-
-    public Page<HotelResponseDto> getAmenityHotels(Long amenityId, Pageable pageable, String filterBy, String filterValue) {
-        return hotelRepository.findAll(
-                where(
-                        HotelSpecifications.hasAmenity(amenityId.toString())
-                                .and(HotelSpecifications.hasFilter(filterBy, filterValue))
-                ),
-                pageable
-        ).map(hotelMapper::toResponseDto);
     }
 }

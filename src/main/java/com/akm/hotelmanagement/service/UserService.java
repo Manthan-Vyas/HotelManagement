@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.springframework.data.jpa.domain.Specification.where;
@@ -32,6 +33,7 @@ public class UserService implements UserDetailsService {
 
     private final UserMapper userMapper;
 
+    @Transactional
     public UserResponseDto createUser(CreateUserRequestDto userCreatDto) {
         if (userRepository.existsByUsername(userCreatDto.getUsername())) {
             throw new ResourceAlreadyExistsException("Username already exists with username: " + userCreatDto.getUsername());
@@ -46,18 +48,21 @@ public class UserService implements UserDetailsService {
         return userMapper.toResponseDto(userRepository.save(user));
     }
 
+    @Transactional(readOnly = true)
     public UserResponseDto getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .map(userMapper::toResponseDto)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     }
 
+    @Transactional(readOnly = true)
     public UserResponseDto getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .map(userMapper::toResponseDto)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
+    @Transactional(readOnly = true)
     public Page<UserResponseDto> getAllUsers(Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return userRepository.findAll(pageable)
@@ -69,6 +74,7 @@ public class UserService implements UserDetailsService {
         ).map(userMapper::toResponseDto);
     }
 
+    @Transactional(readOnly = true)
     public Page<UserResponseDto> getAdmins(Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return userRepository.findAll(
@@ -84,6 +90,7 @@ public class UserService implements UserDetailsService {
         ).map(userMapper::toResponseDto);
     }
 
+    @Transactional
     public UserResponseDto updateUser(String username, UpdateUserRequestDto dto, boolean isPut) {
         if (isPut && dto.hasAnyFieldNull()) {
             throw new ResponseStatusException(
@@ -115,6 +122,7 @@ public class UserService implements UserDetailsService {
         return userMapper.toResponseDto(userRepository.save(user));
     }
 
+    @Transactional
     public void deleteUser(String username) {
         if (!userRepository.existsByUsername(username)) {
             throw new ResourceNotFoundException("User not found with username " + username);
@@ -122,6 +130,7 @@ public class UserService implements UserDetailsService {
         userRepository.deleteByUsername(username);
     }
 
+    @Transactional
     public UserResponseDto changeUserEnabled(String username, boolean enabled) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with username " + username));
@@ -191,10 +200,12 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
 
+    @Transactional(readOnly = true)
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
