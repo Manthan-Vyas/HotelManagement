@@ -12,13 +12,10 @@ import com.akm.hotelmanagement.repository.HotelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
-
-import java.nio.channels.FileChannel;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
@@ -107,7 +104,7 @@ public class HotelService {
     }
 
     @Transactional(readOnly = true)
-    public Page<HotelResponseDto> getAmenityHotels(Long amenityId, Pageable pageable, String filterBy, String filterValue) {
+    public Page<HotelResponseDto> getHotelsByAmenityId(Long amenityId, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return hotelRepository.findAll(
                     where(

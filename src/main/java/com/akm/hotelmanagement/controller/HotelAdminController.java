@@ -1,11 +1,13 @@
 package com.akm.hotelmanagement.controller;
 
+import com.akm.hotelmanagement.assembler.AmenityModelAssembler;
 import com.akm.hotelmanagement.assembler.HotelModelAssembler;
 import com.akm.hotelmanagement.assembler.ReservationModelAssembler;
 import com.akm.hotelmanagement.assembler.RoomModelAssembler;
 import com.akm.hotelmanagement.assembler.models.HotelModel;
 import com.akm.hotelmanagement.assembler.models.ReservationModel;
 import com.akm.hotelmanagement.assembler.models.RoomModel;
+import com.akm.hotelmanagement.controller.base.AdminBaseController;
 import com.akm.hotelmanagement.dto.hotel.UpdateHotelRequestDto;
 import com.akm.hotelmanagement.dto.room.CreateHotelRoomRequestDto;
 import com.akm.hotelmanagement.dto.room.UpdateHotelRoomRequestDto;
@@ -13,6 +15,7 @@ import com.akm.hotelmanagement.entity.util.ReservationStatus;
 import com.akm.hotelmanagement.entity.util.RoomStatus;
 import com.akm.hotelmanagement.exception.ResourceAlreadyExistsException;
 import com.akm.hotelmanagement.exception.ResourceNotFoundException;
+import com.akm.hotelmanagement.service.AmenityService;
 import com.akm.hotelmanagement.service.HotelService;
 import com.akm.hotelmanagement.service.ReservationService;
 import com.akm.hotelmanagement.service.RoomService;
@@ -22,28 +25,24 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import static com.akm.hotelmanagement.util.Constants.*;
 import static com.akm.hotelmanagement.util.Utils.getPageable;
 
 @Validated
 @RestController
 @RequestMapping("/hotel-admin")
-@RequiredArgsConstructor
 @Tag(name = "Hotel Admin", description = "Operations pertaining to hotel administration")
-public class HotelAdminController {
+public class HotelAdminController extends AdminBaseController {
 
-    private final HotelService hotelService;
-    private final RoomService roomService;
-    private final ReservationService reservationService;
 
-    private final HotelModelAssembler hotelModelAssembler;
-    private final RoomModelAssembler roomModelAssembler;
-    private final ReservationModelAssembler reservationModelAssembler;
+    public HotelAdminController(AmenityService amenityService, AmenityModelAssembler amenityModelAssembler, HotelService hotelService, HotelModelAssembler hotelModelAssembler, RoomService roomService, RoomModelAssembler roomModelAssembler, ReservationService reservationService, ReservationModelAssembler reservationModelAssembler) {
+        super(amenityService, amenityModelAssembler, hotelService, hotelModelAssembler, roomService, roomModelAssembler, reservationService, reservationModelAssembler);
+    }
 
     @GetMapping
     @Operation(summary = "Hotel admin home", description = "Get the home page for hotel admin")
@@ -77,47 +76,6 @@ public class HotelAdminController {
         ));
     }
 
-    @GetMapping("/hotels/{hotelId}")
-    @Operation(summary = "Get hotel details", description = "Get details of a hotel by providing the hotel id")
-    public ResponseEntity<ResponseWrapper<HotelModel>> getHotelDetails(
-            @PathVariable Long hotelId,
-            @Nullable HttpServletRequest request
-    ) {
-        return ResponseEntity.ok(
-                ResponseWrapper.getOkResponseWrapper(
-                        hotelModelAssembler.toModel(
-                                hotelService.getHotelById(hotelId)
-                        ),
-                        request
-                )
-        );
-    }
-
-    @GetMapping("/hotels/{hotelId}/rooms")
-    @Operation(summary = "Get hotel rooms", description = "Get all rooms of a hotel by providing the hotel id")
-    public ResponseEntity<ResponseWrapper<PagedResponse<RoomModel>>> getHotelRooms(
-            @PathVariable Long hotelId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "number") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir,
-            @RequestParam(required = false) String filterBy,
-            @RequestParam(required = false) String filterValue,
-            @Nullable HttpServletRequest request
-    ) {
-        return ResponseEntity.ok(
-                ResponseWrapper.getOkResponseWrapperPaged(
-                        roomService.getRoomsByHotelId(
-                                hotelId,
-                                getPageable(page, size, sortBy, sortDir),
-                                filterBy,
-                                filterValue
-                        ).map(roomModelAssembler::toModel),
-                        request
-                )
-        );
-    }
-
     @GetMapping("/hotels/{hotelId}/rooms/{roomId}")
     @Operation(summary = "Get room details", description = "Get details of a room by providing the hotel id and room id")
     public ResponseEntity<ResponseWrapper<RoomModel>> getHotelRoomDetails(
@@ -143,10 +101,10 @@ public class HotelAdminController {
     public ResponseEntity<ResponseWrapper<PagedResponse<ReservationModel>>> getHotelRoomReservations(
             @PathVariable Long hotelId,
             @PathVariable Long roomId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "checkIn") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(defaultValue = DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(defaultValue = DEFAULT_RESERVATION_SORT_BY) String sortBy,
+            @RequestParam(defaultValue = DEFAULT_SORT_DIR) String sortDir,
             @RequestParam(required = false) String filterBy,
             @RequestParam(required = false) String filterValue,
             @Nullable HttpServletRequest request
@@ -156,7 +114,7 @@ public class HotelAdminController {
         }
         return ResponseEntity.ok(
                 ResponseWrapper.getOkResponseWrapperPaged(
-                        reservationService.getAllRoomReservations(
+                        reservationService.getReservationsByRoomId(
                                 roomId,
                                 getPageable(page, size, sortBy, sortDir),
                                 filterBy,

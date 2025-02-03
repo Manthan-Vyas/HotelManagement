@@ -57,7 +57,7 @@ public class AmenityService {
     }
 
     @Transactional(readOnly = true)
-    public Page<AmenityResponseDto> getAmenitiesByHotelId(Long hotelId, Pageable pageable) {
+    public Page<AmenityResponseDto> getAmenitiesByHotelId(Long hotelId, Pageable pageable, String filterBy, String filterValue) {
         return amenityRepository.findAll(
                 where(
                         AmenitySpecifications.hasFilter(
@@ -70,7 +70,7 @@ public class AmenityService {
     }
 
     @Transactional(readOnly = true)
-    public Page<AmenityResponseDto> getAmenitiesByRoomId(Long roomId, Pageable pageable) {
+    public Page<AmenityResponseDto> getAmenitiesByRoomId(Long roomId, Pageable pageable, String filterBy, String filterValue) {
         return amenityRepository.findAll(
                 where(
                         AmenitySpecifications.hasFilter(

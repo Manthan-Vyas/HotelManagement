@@ -23,6 +23,7 @@ public class RoomSpecification {
                 case "capacity" -> criteriaBuilder.equal(root.get("capacity"), Integer.parseInt(filterValue));
                 case "price" -> criteriaBuilder.equal(root.get("pricePerNight"), Double.parseDouble(filterValue));
                 case "hotel-id" -> criteriaBuilder.equal(root.get("hotel").get("id"), Long.parseLong(filterValue));
+                case "amenity-id" -> criteriaBuilder.equal(root.join("amenities").get("id"), Long.parseLong(filterValue)); // todo: check if works
                 case "hotel-name" -> criteriaBuilder.equal(root.get("hotel").get("name"), filterValue);
                 case "reservation-id" -> criteriaBuilder.equal(root.join("reservations").get("id"), Long.parseLong(filterValue));
                 case "username" -> criteriaBuilder.equal(root.join("reservations").get("user").get("username"), filterValue);

@@ -21,6 +21,7 @@ public class HotelSpecifications {
                 case "state" -> criteriaBuilder.like(criteriaBuilder.lower(root.get("state")), "%" + filterValue.toLowerCase() + "%");
                 case "zip" -> criteriaBuilder.equal(root.get("zip"), filterValue);
                 case "amenity-id" -> criteriaBuilder.equal(root.join("amenities").get("id"), Long.parseLong(filterValue));
+                case "room-id" -> criteriaBuilder.equal(root.join("rooms").get("id"), Long.parseLong(filterValue));
                 case "rating" -> criteriaBuilder.equal(root.get("rating"), filterValue);
                 default -> throw new IllegalArgumentException("Invalid filter field: " + filterBy);
             };
@@ -34,9 +35,9 @@ public class HotelSpecifications {
             }
             return criteriaBuilder.like(criteriaBuilder.lower(root.get("amenities")), "%" + amenity.toLowerCase() + "%");
         };
-    }
+    } // todo: check if works
 
-    public static Specification<Hotel> hasAmenities(Set<String> amenities) {
+    public static Specification<Hotel> hasAmenities(Set<Long> amenities) {
         return (root, query, criteriaBuilder) -> {
             if (amenities == null || amenities.isEmpty()) {
                 return null;
@@ -44,5 +45,5 @@ public class HotelSpecifications {
             Join<Hotel, Amenity>  amenityJoin = root.join("amenities");
             return amenityJoin.get("name").in(amenities);
         };
-    }
+    } // todo: check if works
 }

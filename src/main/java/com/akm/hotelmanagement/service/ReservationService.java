@@ -82,7 +82,7 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReservationResponseDto> getAllUserReservations(String username, Pageable pageable, String filterBy, String filterValue) {
+    public Page<ReservationResponseDto> getReservationsByUsername(String username, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return reservationRepository.findAll(
                     where(ReservationSpecifications.hasFilter("username", username)),
@@ -99,7 +99,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public Page<ReservationResponseDto> getAllHotelReservations(Long id, Pageable pageable, String filterBy, String filterValue) {
+    public Page<ReservationResponseDto> getReservationsByHotelId(Long id, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return reservationRepository.findAll(where(
                     ReservationSpecifications.hasFilter(
@@ -118,7 +118,7 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReservationResponseDto> getAllRoomReservations (Long id, Pageable pageable, String filterBy, String filterValue) {
+    public Page<ReservationResponseDto> getReservationsByRoomId(Long id, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return reservationRepository.findAll(where(
                     ReservationSpecifications.hasFilter(

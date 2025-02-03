@@ -107,6 +107,22 @@ public class RoomService {
     }
 
     @Transactional(readOnly = true)
+    public Page<RoomResponseDto> getRoomsByAmenityId(Long hotelId, Pageable pageable, String filterBy, String filterValue) {
+        if (filterBy == null || filterValue == null) {
+            return roomRepository.findAll(
+                            where(RoomSpecification.hasFilter("amenity-id", hotelId.toString())),
+                            pageable
+                    )
+                    .map(roomMapper::toResponseDto);
+        }
+        return roomRepository.findAll(
+                where(RoomSpecification.hasFilter("amenity-id", hotelId.toString()))
+                        .and(where(RoomSpecification.hasFilter(filterBy, filterValue))),
+                pageable
+        ).map(roomMapper::toResponseDto);
+    }
+
+    @Transactional(readOnly = true)
     public Page<RoomResponseDto> getRoomsByUsername(String username, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return roomRepository.findAll(
