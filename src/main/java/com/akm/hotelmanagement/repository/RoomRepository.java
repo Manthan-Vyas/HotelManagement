@@ -1,7 +1,6 @@
 package com.akm.hotelmanagement.repository;
 
 import com.akm.hotelmanagement.entity.Room;
-import jakarta.validation.constraints.Positive;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

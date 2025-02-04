@@ -1,7 +1,10 @@
 package com.akm.hotelmanagement.controller;
 
 import com.akm.hotelmanagement.assembler.*;
-import com.akm.hotelmanagement.assembler.models.*;
+import com.akm.hotelmanagement.assembler.models.HotelModel;
+import com.akm.hotelmanagement.assembler.models.ReservationModel;
+import com.akm.hotelmanagement.assembler.models.RoomModel;
+import com.akm.hotelmanagement.assembler.models.UserModel;
 import com.akm.hotelmanagement.controller.base.AdminBaseController;
 import com.akm.hotelmanagement.dto.hotel.CreateHotelRequestDto;
 import com.akm.hotelmanagement.dto.user.CreateUserRequestDto;
@@ -20,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 
 import static com.akm.hotelmanagement.util.Constants.*;
 import static com.akm.hotelmanagement.util.Utils.getPageable;
@@ -133,6 +135,67 @@ public class AdminController extends AdminBaseController {
         return ResponseEntity.ok(
                 ResponseWrapper.getOkResponseWrapper(
                         userModelAssembler.toModel(userService.getUserByUsername(username)),
+                        request
+                )
+        );
+    }
+
+    @GetMapping("reservations/{reservationId}")
+    @Operation(summary = "Get reservation details", description = "Get details of a reservation by providing the reservation id")
+    public ResponseEntity<ResponseWrapper<ReservationModel>> getReservationDetails(
+            @PathVariable Long reservationId,
+            @Nullable HttpServletRequest request
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.getOkResponseWrapper(
+                        reservationModelAssembler.toModel(
+                                reservationService.getReservationById(reservationId)
+                        ),
+                        request
+                )
+        );
+    }
+
+    @GetMapping("reservations/{reservationId}/room")
+    @Operation(summary = "Get room by reservation ID", description = "Get the room details by providing the reservation ID in the path")
+    public ResponseEntity<ResponseWrapper<RoomModel>> getRoomByReservationId(
+            @PathVariable Long reservationId, HttpServletRequest request
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.getOkResponseWrapper(
+                        roomModelAssembler.toModel(
+                                roomService.getRoomByReservationId(reservationId)
+                        ),
+                        request
+                )
+        );
+    }
+
+    @GetMapping("reservations/{reservationId}/hotel")
+    @Operation(summary = "Get hotel by reservation ID", description = "Get the hotel details by providing the reservation ID in the path")
+    public ResponseEntity<ResponseWrapper<HotelModel>> getHotelByReservationId(
+            @PathVariable Long reservationId, HttpServletRequest request
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.getOkResponseWrapper(
+                        hotelModelAssembler.toModel(
+                                hotelService.getHotelByReservationId(reservationId)
+                        ),
+                        request
+                )
+        );
+    }
+
+    @GetMapping("reservations/{reservationId}/user")
+    @Operation(summary = "Get user by reservation ID", description = "Get the user details by providing the reservation ID in the path")
+    public ResponseEntity<ResponseWrapper<UserModel>> getUserByReservationId(
+            @PathVariable Long reservationId, HttpServletRequest request
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.getOkResponseWrapper(
+                        userModelAssembler.toModel(
+                                userService.getUserByReservationId(reservationId)
+                        ),
                         request
                 )
         );

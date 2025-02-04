@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.akm.hotelmanagement.util.Constants.*;
-import static com.akm.hotelmanagement.util.Utils.*;
+import static com.akm.hotelmanagement.util.Utils.getPageable;
 
 @AllArgsConstructor
 public abstract class BaseController {
@@ -85,8 +85,8 @@ public abstract class BaseController {
         );
     }
 
-    @GetMapping("/hotels/{roomId}/amenities")
-    @Operation(summary = "Get hotel's amenities", description = "Get all amenities of a hotel by providing the hotel ID in the path")
+    @GetMapping("/rooms/{roomId}/amenities")
+    @Operation(summary = "Get room's Hotel's amenities", description = "Get all amenities of a hotel that contains room by providing the room ID in the path")
     public ResponseEntity<ResponseWrapper<PagedResponse<AmenityModel>>> getAmenitiesByRoomId(
             @PathVariable Long roomId,
             @RequestParam(defaultValue = DEFAULT_PAGE_NUMBER) int page,

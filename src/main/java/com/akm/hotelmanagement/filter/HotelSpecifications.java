@@ -22,6 +22,7 @@ public class HotelSpecifications {
                 case "zip" -> criteriaBuilder.equal(root.get("zip"), filterValue);
                 case "amenity-id" -> criteriaBuilder.equal(root.join("amenities").get("id"), Long.parseLong(filterValue));
                 case "room-id" -> criteriaBuilder.equal(root.join("rooms").get("id"), Long.parseLong(filterValue));
+                case "reservation-id" -> criteriaBuilder.equal(root.join("rooms").join("reservations").get("id"), Long.parseLong(filterValue));
                 case "rating" -> criteriaBuilder.equal(root.get("rating"), filterValue);
                 default -> throw new IllegalArgumentException("Invalid filter field: " + filterBy);
             };

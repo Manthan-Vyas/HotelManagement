@@ -1,7 +1,9 @@
 package com.akm.hotelmanagement.controller;
 
 import com.akm.hotelmanagement.assembler.*;
+import com.akm.hotelmanagement.assembler.models.HotelModel;
 import com.akm.hotelmanagement.assembler.models.ReservationModel;
+import com.akm.hotelmanagement.assembler.models.RoomModel;
 import com.akm.hotelmanagement.assembler.models.UserModel;
 import com.akm.hotelmanagement.controller.base.BaseController;
 import com.akm.hotelmanagement.dto.reservation.CreateOrUpdateUserRoomReservationRequestDto;
@@ -21,13 +23,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static com.akm.hotelmanagement.util.Constants.*;
-import static com.akm.hotelmanagement.util.Utils.getPageable;
-import static com.akm.hotelmanagement.util.Utils.isAuthenticatedUser;
+import static com.akm.hotelmanagement.util.Utils.*;
 
 @Validated
 @RestController
 @RequestMapping("/users")
-@Tag(name = "User Controller", description = "Endpoints for user operations")
+@Tag(name = "User", description = "Endpoints for user operations")
 public class UserController extends BaseController {
 
     private final UserService userService;
@@ -166,6 +167,42 @@ public class UserController extends BaseController {
         return ResponseEntity.ok(
                 ResponseWrapper.getOkResponseWrapper(
                         reservationModel,
+                        request
+                )
+        );
+    }
+
+    @GetMapping("/{username}/reservations/{reservationId}/hotel")
+    @Operation(summary = "Get hotel by reservation ID", description = "Get the hotel details of a reservation by providing the reservation ID")
+    public ResponseEntity<ResponseWrapper<HotelModel>> getHotelByReservationId(
+            @PathVariable String username,
+            @PathVariable Long reservationId,
+            @Nullable HttpServletRequest request
+    ) {
+        return ResponseEntity.ok(
+                ResponseWrapper.getOkResponseWrapper(
+                        hotelModelAssembler.toModel(
+                                hotelService.getHotelByReservationId(reservationId)
+                        ),
+                        request
+                )
+        );
+    }
+
+    @GetMapping("/{username}/reservations/{reservationId}/room")
+    public ResponseEntity<ResponseWrapper<RoomModel>> getRoomByReservationId(
+            @PathVariable String username,
+            @PathVariable Long reservationId,
+            @Nullable HttpServletRequest request
+    ) {
+        if (isNotValidUserReservation(getCurrentUsername(), reservationId)) {
+            throw new AccessDeniedException("Access denied: You can only access your own data");
+        }
+        return ResponseEntity.ok(
+                ResponseWrapper.getOkResponseWrapper(
+                        roomModelAssembler.toModel(
+                                roomService.getRoomByReservationId(reservationId)
+                        ),
                         request
                 )
         );

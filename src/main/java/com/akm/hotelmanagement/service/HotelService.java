@@ -42,6 +42,14 @@ public class HotelService {
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id: " + id));
     }
 
+    @Transactional
+    public HotelResponseDto getHotelByReservationId(Long reservationId) {
+        return hotelMapper.toResponseDto(hotelRepository.findAll(where(HotelSpecifications.hasFilter("reservation-id", reservationId.toString()))).stream().findFirst().orElseThrow(
+                () -> new ResourceNotFoundException("Hotel not found with reservation id: " + reservationId)
+        ));
+
+    }
+
     @Transactional(readOnly = true)
     public Page<HotelResponseDto> getAllHotels(Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {

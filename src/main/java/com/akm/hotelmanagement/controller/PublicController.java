@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RestController
 @RequestMapping("/")
-@Tag(name = "Public Controller", description = "Endpoints accessible to the public")
+@Tag(name = "Public", description = "Endpoints accessible to the public")
 public class PublicController extends BaseController {
 
     private final UserService userService;

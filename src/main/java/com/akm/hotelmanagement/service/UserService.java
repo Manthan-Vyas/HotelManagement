@@ -62,6 +62,17 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
+    @Transactional
+    public UserResponseDto getUserByReservationId(Long reservationId) {
+        return userMapper.toResponseDto(
+                userRepository.findAll(
+                        where(UserSpecifications.hasFilter("reservation-id", reservationId.toString()))
+                ).stream().findFirst().orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with reservation id " + reservationId)
+                )
+        );
+    }
+
     @Transactional(readOnly = true)
     public Page<UserResponseDto> getAllUsers(Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
@@ -138,6 +149,16 @@ public class UserService implements UserDetailsService {
         return userMapper.toResponseDto(userRepository.save(user));
     }
 
+    @Transactional(readOnly = true)
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
     private void checkForDuplicateFields(UpdateUserRequestDto dto, User user) {
         if (dto.getName() != null && dto.getName().equals(user.getName())) {
             throw new ResponseStatusException(
@@ -198,15 +219,5 @@ public class UserService implements UserDetailsService {
                 .password(user.getPassword())
                 .roles(String.valueOf(user.getRole()))
                 .build();
-    }
-
-    @Transactional(readOnly = true)
-    public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
     }
 }

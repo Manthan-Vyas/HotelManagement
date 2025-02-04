@@ -39,7 +39,6 @@ import static com.akm.hotelmanagement.util.Utils.getPageable;
 @Tag(name = "Hotel Admin", description = "Operations pertaining to hotel administration")
 public class HotelAdminController extends AdminBaseController {
 
-
     public HotelAdminController(AmenityService amenityService, AmenityModelAssembler amenityModelAssembler, HotelService hotelService, HotelModelAssembler hotelModelAssembler, RoomService roomService, RoomModelAssembler roomModelAssembler, ReservationService reservationService, ReservationModelAssembler reservationModelAssembler) {
         super(amenityService, amenityModelAssembler, hotelService, hotelModelAssembler, roomService, roomModelAssembler, reservationService, reservationModelAssembler);
     }
@@ -96,6 +95,34 @@ public class HotelAdminController extends AdminBaseController {
         );
     }
 
+    @GetMapping("/hotels/{hotelId}/reservations")
+    @Operation(summary = "Get hotel reservations", description = "Get all reservations of a hotel by providing the hotel id")
+    public ResponseEntity<ResponseWrapper<PagedResponse<ReservationModel>>> getHotelReservations(
+            @PathVariable Long hotelId,
+            @RequestParam(defaultValue = DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(defaultValue = DEFAULT_RESERVATION_SORT_BY) String sortBy,
+            @RequestParam(defaultValue = DEFAULT_SORT_DIR) String sortDir,
+            @RequestParam(required = false) String filterBy,
+            @RequestParam(required = false) String filterValue,
+            @Nullable HttpServletRequest request
+    ) {
+        if (hotelService.getHotelById(hotelId) == null) {
+            throw new ResourceNotFoundException("Hotel not found with id: " + hotelId);
+        }
+        return ResponseEntity.ok(
+                ResponseWrapper.getOkResponseWrapperPaged(
+                        reservationService.getReservationsByHotelId(
+                                hotelId,
+                                getPageable(page, size, sortBy, sortDir),
+                                filterBy,
+                                filterValue
+                        ).map(reservationModelAssembler::toModel),
+                        request
+                )
+        );
+    }
+
     @GetMapping("/hotels/{hotelId}/rooms/{roomId}/reservations")
     @Operation(summary = "Get room reservations", description = "Get all reservations of a room by providing the hotel id and room id")
     public ResponseEntity<ResponseWrapper<PagedResponse<ReservationModel>>> getHotelRoomReservations(
@@ -145,6 +172,27 @@ public class HotelAdminController extends AdminBaseController {
                 )
         );
     }
+
+    @GetMapping("/hotels/{hotelId}/rooms/{roomId}/reservations/{reservationId}/room")
+    @Operation(summary = "Get room details by reservation id", description = "Get details of a room by providing the hotel id and reservation id")
+    public ResponseEntity<ResponseWrapper<RoomModel>> getRoomByReservationId(
+            @PathVariable Long hotelId,
+            @PathVariable Long roomId,
+            @PathVariable Long reservationId,
+            @Nullable HttpServletRequest request
+    ) {
+        if(isNotValidHotelRoomReservation(hotelId, roomId, reservationId)) {
+            throw new ResourceNotFoundException("Room not found with reservation id: " + reservationId);
+        }
+        return ResponseEntity.ok(
+                ResponseWrapper.getOkResponseWrapper(
+                        roomModelAssembler.toModel(
+                                roomService.getRoomByReservationId(reservationId)
+                        ),
+                        request
+                )
+        );
+    } // todo: what about /hotels/{hotelId}/reservation/hotel
 
     @PatchMapping("/hotels/{hotelId}/rooms/{roomId}/reservations/{reservationId}/status")
     @Operation(summary = "Update room reservation status", description = "Update the status of a reservation of a room by providing the hotel id, room id, reservation id, and the new status")

@@ -16,10 +16,10 @@ import com.akm.hotelmanagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -156,8 +156,10 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id).orElseThrow( () ->
                 new ResourceNotFoundException("Reservation not found with id: " + id)
         );
+        if (reservation.getStatus() == ReservationStatus.CANCELLED_BY_USER) {
+            throw new ResourceAlreadyExistsException("Reservation already cancelled by user");
+        }
         reservation.setStatus(status);
-
         return reservationMapper.toResponseDto(
                 reservationRepository.save(reservation)
         );
@@ -175,7 +177,7 @@ public class ReservationService {
     public ReservationResponseDto cancelReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + reservationId));
-        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
+        if (reservation.getStatus() == ReservationStatus.CANCELLED || reservation.getStatus() == ReservationStatus.CANCELLED_BY_USER) {
             throw new ResourceAlreadyExistsException("Reservation already cancelled");
         }
         reservation.setStatus(ReservationStatus.CANCELLED);
