@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class ReservationMapperTest {
-
     private ReservationMapper reservationMapper;
     private UserRepository userRepository;
     private RoomRepository roomRepository;

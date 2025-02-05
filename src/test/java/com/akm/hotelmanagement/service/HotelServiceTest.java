@@ -1,8 +1,8 @@
 package com.akm.hotelmanagement.service;
 
 import com.akm.hotelmanagement.dto.hotel.CreateHotelRequestDto;
-import com.akm.hotelmanagement.dto.hotel.UpdateHotelRequestDto;
 import com.akm.hotelmanagement.dto.hotel.HotelResponseDto;
+import com.akm.hotelmanagement.dto.hotel.UpdateHotelRequestDto;
 import com.akm.hotelmanagement.entity.Hotel;
 import com.akm.hotelmanagement.exception.ResourceAlreadyExistsException;
 import com.akm.hotelmanagement.exception.ResourceNotFoundException;
@@ -24,20 +24,15 @@ import java.util.HashSet;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class HotelServiceTest {
-
     @Mock
     private HotelRepository hotelRepository;
-
     @Mock
     private HotelMapper hotelMapper;
-
     @InjectMocks
     private HotelService hotelService;
 

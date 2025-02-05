@@ -31,13 +31,10 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AmenityServiceTest {
-
     @Mock
     private AmenityRepository amenityRepository;
-
     @Mock
     private AmenityMapper amenityMapper;
-
     @InjectMocks
     private AmenityService amenityService;
 

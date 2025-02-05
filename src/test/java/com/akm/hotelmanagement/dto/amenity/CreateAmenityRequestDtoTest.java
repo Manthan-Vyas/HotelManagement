@@ -7,6 +7,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -14,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CreateAmenityRequestDtoTest {
-
     private static Validator validator;
 
     @BeforeAll
@@ -60,5 +60,4 @@ public class CreateAmenityRequestDtoTest {
         assertEquals(1, violations.size());
         assertEquals("{error.amenity.description.size}", violations.iterator().next().getMessageTemplate());
     }
-
 }

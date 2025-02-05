@@ -1,52 +1,48 @@
 package com.akm.hotelmanagement.controller;
 
-import com.akm.hotelmanagement.assembler.HotelModelAssembler;
-import com.akm.hotelmanagement.assembler.ReservationModelAssembler;
-import com.akm.hotelmanagement.assembler.RoomModelAssembler;
-import com.akm.hotelmanagement.assembler.UserModelAssembler;
+import com.akm.hotelmanagement.assembler.*;
 import com.akm.hotelmanagement.assembler.models.HotelModel;
 import com.akm.hotelmanagement.assembler.models.ReservationModel;
 import com.akm.hotelmanagement.assembler.models.RoomModel;
 import com.akm.hotelmanagement.assembler.models.UserModel;
+import com.akm.hotelmanagement.controller.base.BaseController;
 import com.akm.hotelmanagement.dto.reservation.CreateOrUpdateUserRoomReservationRequestDto;
 import com.akm.hotelmanagement.dto.user.UpdateUserRequestDto;
 import com.akm.hotelmanagement.dto.user.UserResponseDto;
-import com.akm.hotelmanagement.service.HotelService;
-import com.akm.hotelmanagement.service.ReservationService;
-import com.akm.hotelmanagement.service.RoomService;
-import com.akm.hotelmanagement.service.UserService;
+import com.akm.hotelmanagement.service.*;
 import com.akm.hotelmanagement.wrapper.PagedResponse;
 import com.akm.hotelmanagement.wrapper.ResponseWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import static com.akm.hotelmanagement.util.Constants.*;
 import static com.akm.hotelmanagement.util.Utils.getPageable;
 import static com.akm.hotelmanagement.util.Utils.isAuthenticatedUser;
 
 @Validated
 @RestController
 @RequestMapping("/users")
-@RequiredArgsConstructor
-@Tag(name = "User Controller", description = "Endpoints for user operations")
-public class UserController {
-
+@Tag(name = "User", description = "Endpoints for user operations")
+public class UserController extends BaseController {
     private final UserService userService;
-    private final HotelService hotelService;
-    private final RoomService roomService;
     private final ReservationService reservationService;
-
     private final UserModelAssembler userModelAssembler;
-    private final HotelModelAssembler hotelModelAssembler;
-    private final RoomModelAssembler roomModelAssembler;
     private final ReservationModelAssembler reservationModelAssembler;
+
+    public UserController(AmenityService amenityService, AmenityModelAssembler amenityModelAssembler, HotelService hotelService, HotelModelAssembler hotelModelAssembler, RoomService roomService, RoomModelAssembler roomModelAssembler, UserService userService, ReservationService reservationService, UserModelAssembler userModelAssembler, ReservationModelAssembler reservationModelAssembler) {
+        super(amenityService, amenityModelAssembler, hotelService, hotelModelAssembler, roomService, roomModelAssembler);
+        this.userService = userService;
+        this.reservationService = reservationService;
+        this.userModelAssembler = userModelAssembler;
+        this.reservationModelAssembler = reservationModelAssembler;
+    }
 
     @GetMapping
     @Operation(summary = "User home", description = "Get the home page of a user")
@@ -133,17 +129,17 @@ public class UserController {
     @Operation(summary = "Get user reservations", description = "Get all reservations of a user by providing the username with pagination, sorting, and filtering options")
     public ResponseEntity<ResponseWrapper<PagedResponse<ReservationModel>>> getUserReservations(
             @PathVariable String username,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "checkIn") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(defaultValue = DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(defaultValue = DEFAULT_RESERVATION_SORT_BY) String sortBy,
+            @RequestParam(defaultValue = DEFAULT_SORT_DIR) String sortDir,
             @RequestParam(required = false) String filterBy,
             @RequestParam(required = false) String filterValue,
             @Nullable HttpServletRequest request
     ) {
         return ResponseEntity.ok(
                 ResponseWrapper.getOkResponseWrapperPaged(
-                        reservationService.getAllUserReservations(
+                        reservationService.getReservationsByUsername(
                                 getValidUser(username).getUsername(),
                                 getPageable(page, size, sortBy, sortDir),
                                 filterBy,
@@ -170,6 +166,45 @@ public class UserController {
         return ResponseEntity.ok(
                 ResponseWrapper.getOkResponseWrapper(
                         reservationModel,
+                        request
+                )
+        );
+    }
+
+    @GetMapping("/{username}/reservations/{reservationId}/hotel")
+    @Operation(summary = "Get hotel by reservation ID", description = "Get the hotel details of a reservation by providing the reservation ID")
+    public ResponseEntity<ResponseWrapper<HotelModel>> getHotelByReservationId(
+            @PathVariable String username,
+            @PathVariable Long reservationId,
+            @Nullable HttpServletRequest request
+    ) {
+        if (isNotValidUserReservation(username, reservationId)) {
+            throw new AccessDeniedException("Access denied: You can only access your own data");
+        }
+        return ResponseEntity.ok(
+                ResponseWrapper.getOkResponseWrapper(
+                        hotelModelAssembler.toModel(
+                                hotelService.getHotelByReservationId(reservationId)
+                        ),
+                        request
+                )
+        );
+    }
+
+    @GetMapping("/{username}/reservations/{reservationId}/room")
+    public ResponseEntity<ResponseWrapper<RoomModel>> getRoomByReservationId(
+            @PathVariable String username,
+            @PathVariable Long reservationId,
+            @Nullable HttpServletRequest request
+    ) {
+        if (isNotValidUserReservation(username, reservationId)) {
+            throw new AccessDeniedException("Access denied: You can only access your own data");
+        }
+        return ResponseEntity.ok(
+                ResponseWrapper.getOkResponseWrapper(
+                        roomModelAssembler.toModel(
+                                roomService.getRoomByReservationId(reservationId)
+                        ),
                         request
                 )
         );
@@ -211,52 +246,6 @@ public class UserController {
                         reservationModelAssembler.toModel(
                                 reservationService.cancelReservation(reservationId)
                         ),
-                        request
-                )
-        );
-    }
-
-    @GetMapping("/hotels")
-    @Operation(summary = "Get all hotels", description = "Get all hotels with pagination, sorting, and filtering options")
-    public ResponseEntity<ResponseWrapper<PagedResponse<HotelModel>>> getAllHotels(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir,
-            @RequestParam(required = false) String filterBy,
-            @RequestParam(required = false) String filterValue,
-            @Nullable HttpServletRequest request
-    ) {
-        return ResponseEntity.ok(
-                ResponseWrapper.getOkResponseWrapperPaged(
-                        hotelService.getAllHotels(
-                                getPageable(page, size, sortBy, sortDir),
-                                filterBy,
-                                filterValue
-                        ).map(hotelModelAssembler::toModel),
-                        request
-                )
-        );
-    }
-
-    @GetMapping("/rooms")
-    @Operation(summary = "Get all rooms", description = "Get all rooms with pagination, sorting, and filtering options")
-    public ResponseEntity<ResponseWrapper<PagedResponse<RoomModel>>> getAllRooms(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "number") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir,
-            @RequestParam(required = false) String filterBy,
-            @RequestParam(required = false) String filterValue,
-            @Nullable HttpServletRequest request
-    ) {
-        return ResponseEntity.ok(
-                ResponseWrapper.getOkResponseWrapperPaged(
-                        roomService.getAllRooms(
-                                getPageable(page, size, sortBy, sortDir),
-                                filterBy,
-                                filterValue
-                        ).map(roomModelAssembler::toModel),
                         request
                 )
         );

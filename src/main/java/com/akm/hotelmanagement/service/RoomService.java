@@ -1,8 +1,8 @@
 package com.akm.hotelmanagement.service;
 
 import com.akm.hotelmanagement.dto.room.CreateHotelRoomRequestDto;
-import com.akm.hotelmanagement.dto.room.UpdateHotelRoomRequestDto;
 import com.akm.hotelmanagement.dto.room.RoomResponseDto;
+import com.akm.hotelmanagement.dto.room.UpdateHotelRoomRequestDto;
 import com.akm.hotelmanagement.entity.Hotel;
 import com.akm.hotelmanagement.entity.Room;
 import com.akm.hotelmanagement.entity.util.RoomStatus;
@@ -15,20 +15,21 @@ import com.akm.hotelmanagement.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
+
+import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
 @RequiredArgsConstructor
 public class RoomService {
-
     private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
-
     private final RoomMapper roomMapper;
 
     @Transactional
@@ -91,6 +92,16 @@ public class RoomService {
     }
 
     @Transactional(readOnly = true)
+    public Page<RoomResponseDto> getAvailableRooms(LocalDate checkIn, LocalDate checkOut, int noOfGuests, Pageable pageable, String filterBy, String filterValue) {
+        if (filterBy == null || filterValue == null) {
+            return roomRepository.findAvailableRooms(checkIn, checkOut, noOfGuests, pageable, null).map(roomMapper::toResponseDto);
+        }
+        return roomRepository.findAvailableRooms(
+                checkIn, checkOut, noOfGuests, pageable, where(RoomSpecification.hasFilter(filterBy, filterValue))
+        ).map(roomMapper::toResponseDto);
+    }
+
+    @Transactional(readOnly = true)
     public Page<RoomResponseDto> getRoomsByHotelId(Long hotelId, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return roomRepository.findAll(
@@ -101,6 +112,22 @@ public class RoomService {
         }
         return roomRepository.findAll(
                 where(RoomSpecification.hasFilter("hotel-id", hotelId.toString()))
+                        .and(where(RoomSpecification.hasFilter(filterBy, filterValue))),
+                pageable
+        ).map(roomMapper::toResponseDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RoomResponseDto> getRoomsByAmenityId(Long hotelId, Pageable pageable, String filterBy, String filterValue) {
+        if (filterBy == null || filterValue == null) {
+            return roomRepository.findAll(
+                            where(RoomSpecification.hasFilter("amenity-id", hotelId.toString())),
+                            pageable
+                    )
+                    .map(roomMapper::toResponseDto);
+        }
+        return roomRepository.findAll(
+                where(RoomSpecification.hasFilter("amenity-id", hotelId.toString()))
                         .and(where(RoomSpecification.hasFilter(filterBy, filterValue))),
                 pageable
         ).map(roomMapper::toResponseDto);
@@ -146,11 +173,11 @@ public class RoomService {
             return roomMapper.toResponseDto(roomRepository.save(room));
         }
 
-        room.setNumber(dto.getNumber());
+        room.setNumber(Optional.ofNullable(dto.getNumber()).orElse(room.getNumber()));
         room.setType(dto.getType());
         room.setDescription(dto.getDescription());
-        room.setCapacity(dto.getCapacity());
-        room.setPricePerNight(dto.getPricePerNight());
+        room.setCapacity(Optional.ofNullable(dto.getCapacity()).orElse(room.getCapacity()));
+        room.setPricePerNight(Optional.ofNullable(dto.getPricePerNight()).orElse(room.getPricePerNight()));
         room.setImageUrls(dto.getImageUrls());
         return roomMapper.toResponseDto(roomRepository.save(room));
     }

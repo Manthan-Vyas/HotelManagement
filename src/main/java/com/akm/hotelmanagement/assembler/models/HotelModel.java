@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter

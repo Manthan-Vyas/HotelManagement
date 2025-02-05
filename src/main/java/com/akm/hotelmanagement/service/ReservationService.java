@@ -16,10 +16,10 @@ import com.akm.hotelmanagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -29,11 +29,9 @@ import static org.springframework.data.jpa.domain.Specification.where;
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
-
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
-
     private final ReservationMapper reservationMapper;
 
     @Transactional
@@ -44,6 +42,10 @@ public class ReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
         if (dto.getNumberOfGuests() > room.getCapacity()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Number of guests exceeds room capacity");
+        }
+        if (reservationRepository.existsByRoomIdAndCheckInLessThanEqualAndCheckOutGreaterThanEqual(
+                roomId, dto.getCheckOut(), dto.getCheckIn())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Room is already reserved for the given dates");
         }
 
         Reservation reservation = new Reservation();
@@ -82,7 +84,7 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReservationResponseDto> getAllUserReservations(String username, Pageable pageable, String filterBy, String filterValue) {
+    public Page<ReservationResponseDto> getReservationsByUsername(String username, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return reservationRepository.findAll(
                     where(ReservationSpecifications.hasFilter("username", username)),
@@ -99,7 +101,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public Page<ReservationResponseDto> getAllHotelReservations(Long id, Pageable pageable, String filterBy, String filterValue) {
+    public Page<ReservationResponseDto> getReservationsByHotelId(Long id, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return reservationRepository.findAll(where(
                     ReservationSpecifications.hasFilter(
@@ -118,7 +120,7 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReservationResponseDto> getAllRoomReservations (Long id, Pageable pageable, String filterBy, String filterValue) {
+    public Page<ReservationResponseDto> getReservationsByRoomId(Long id, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return reservationRepository.findAll(where(
                     ReservationSpecifications.hasFilter(
@@ -156,8 +158,10 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id).orElseThrow( () ->
                 new ResourceNotFoundException("Reservation not found with id: " + id)
         );
+        if (reservation.getStatus() == ReservationStatus.CANCELLED_BY_USER) {
+            throw new ResourceAlreadyExistsException("Reservation already cancelled by user");
+        }
         reservation.setStatus(status);
-
         return reservationMapper.toResponseDto(
                 reservationRepository.save(reservation)
         );
@@ -175,7 +179,7 @@ public class ReservationService {
     public ReservationResponseDto cancelReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + reservationId));
-        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
+        if (reservation.getStatus() == ReservationStatus.CANCELLED || reservation.getStatus() == ReservationStatus.CANCELLED_BY_USER) {
             throw new ResourceAlreadyExistsException("Reservation already cancelled");
         }
         reservation.setStatus(ReservationStatus.CANCELLED);

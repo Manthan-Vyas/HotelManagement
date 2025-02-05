@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class UserMapper {
-
     private final ReservationRepository reservationRepository;
 
     public CreateUserRequestDto toCreateDto(@NotNull User user) {

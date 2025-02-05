@@ -1,8 +1,8 @@
 package com.akm.hotelmanagement.service;
 
 import com.akm.hotelmanagement.dto.hotel.CreateHotelRequestDto;
-import com.akm.hotelmanagement.dto.hotel.UpdateHotelRequestDto;
 import com.akm.hotelmanagement.dto.hotel.HotelResponseDto;
+import com.akm.hotelmanagement.dto.hotel.UpdateHotelRequestDto;
 import com.akm.hotelmanagement.entity.Hotel;
 import com.akm.hotelmanagement.exception.ResourceAlreadyExistsException;
 import com.akm.hotelmanagement.exception.ResourceNotFoundException;
@@ -12,20 +12,18 @@ import com.akm.hotelmanagement.repository.HotelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
-import java.nio.channels.FileChannel;
+import java.util.Optional;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
 @RequiredArgsConstructor
 public class HotelService {
-
     private final HotelRepository hotelRepository;
     private final HotelMapper hotelMapper;
 
@@ -43,6 +41,14 @@ public class HotelService {
         return hotelRepository.findById(id)
                 .map(hotelMapper::toResponseDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id: " + id));
+    }
+
+    @Transactional
+    public HotelResponseDto getHotelByReservationId(Long reservationId) {
+        return hotelMapper.toResponseDto(hotelRepository.findAll(where(HotelSpecifications.hasFilter("reservation-id", reservationId.toString()))).stream().findFirst().orElseThrow(
+                () -> new ResourceNotFoundException("Hotel not found with reservation id: " + reservationId)
+        ));
+
     }
 
     @Transactional(readOnly = true)
@@ -93,7 +99,7 @@ public class HotelService {
         hotel.setState(dto.getState());
         hotel.setZip(dto.getZip());
         hotel.setDescription(dto.getDescription());
-        hotel.setRating(dto.getRating());
+        hotel.setRating(Optional.ofNullable(dto.getRating()).orElse(hotel.getRating()));
         hotel.setImageUrls(dto.getImageUrls());
         return hotelMapper.toResponseDto(hotelRepository.save(hotel));
     }
@@ -107,7 +113,7 @@ public class HotelService {
     }
 
     @Transactional(readOnly = true)
-    public Page<HotelResponseDto> getAmenityHotels(Long amenityId, Pageable pageable, String filterBy, String filterValue) {
+    public Page<HotelResponseDto> getHotelsByAmenityId(Long amenityId, Pageable pageable, String filterBy, String filterValue) {
         if (filterBy == null || filterValue == null) {
             return hotelRepository.findAll(
                     where(

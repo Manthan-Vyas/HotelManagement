@@ -11,17 +11,16 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static com.akm.hotelmanagement.util.TestUtils.*;
+import static com.akm.hotelmanagement.util.TestUtils.randomValidHotel;
+import static com.akm.hotelmanagement.util.TestUtils.validHotel;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 // info: one or more test might be failed since the test data is not randomly generated and may not satisfy the conditions for insertion in database but this is a rare case scenario. will fix it in the future.
 public class HotelSpecificationsTest {
-
     @PersistenceContext
     private EntityManager entityManager;
-
     @Autowired
     private HotelRepository hotelRepository;
 

@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class AmenityMapper {
-
     private final HotelRepository hotelRepository;
 
     public CreateAmenityRequestDto toCreateDto(@NotNull Amenity amenity) {

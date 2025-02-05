@@ -8,8 +8,8 @@ import com.akm.hotelmanagement.entity.util.UserRole;
 import com.akm.hotelmanagement.exception.ResourceAlreadyExistsException;
 import com.akm.hotelmanagement.exception.ResourceNotFoundException;
 import com.akm.hotelmanagement.filter.UserSpecifications;
-import com.akm.hotelmanagement.repository.UserRepository;
 import com.akm.hotelmanagement.mapper.UserMapper;
+import com.akm.hotelmanagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,10 +27,8 @@ import static org.springframework.data.jpa.domain.Specification.where;
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final UserMapper userMapper;
 
     @Transactional
@@ -60,6 +58,17 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email)
                 .map(userMapper::toResponseDto)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    }
+
+    @Transactional
+    public UserResponseDto getUserByReservationId(Long reservationId) {
+        return userMapper.toResponseDto(
+                userRepository.findAll(
+                        where(UserSpecifications.hasFilter("reservation-id", reservationId.toString()))
+                ).stream().findFirst().orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with reservation id " + reservationId)
+                )
+        );
     }
 
     @Transactional(readOnly = true)
@@ -138,6 +147,16 @@ public class UserService implements UserDetailsService {
         return userMapper.toResponseDto(userRepository.save(user));
     }
 
+    @Transactional(readOnly = true)
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
     private void checkForDuplicateFields(UpdateUserRequestDto dto, User user) {
         if (dto.getName() != null && dto.getName().equals(user.getName())) {
             throw new ResponseStatusException(
@@ -193,20 +212,13 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found" + username));
+        if (!user.isEnabled()) {
+            throw new UsernameNotFoundException("User is disabled with username: " + username);
+        }
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
                 .roles(String.valueOf(user.getRole()))
                 .build();
-    }
-
-    @Transactional(readOnly = true)
-    public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
     }
 }

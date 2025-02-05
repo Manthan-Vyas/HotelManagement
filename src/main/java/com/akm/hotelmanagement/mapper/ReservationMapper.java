@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ReservationMapper {
-
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
 

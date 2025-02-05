@@ -1,8 +1,8 @@
 package com.akm.hotelmanagement.service;
 
 import com.akm.hotelmanagement.dto.room.CreateHotelRoomRequestDto;
-import com.akm.hotelmanagement.dto.room.UpdateHotelRoomRequestDto;
 import com.akm.hotelmanagement.dto.room.RoomResponseDto;
+import com.akm.hotelmanagement.dto.room.UpdateHotelRoomRequestDto;
 import com.akm.hotelmanagement.entity.Hotel;
 import com.akm.hotelmanagement.entity.Room;
 import com.akm.hotelmanagement.entity.util.RoomStatus;
@@ -17,7 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Collections;
@@ -25,23 +28,17 @@ import java.util.HashSet;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RoomServiceTest {
-
     @Mock
     private RoomRepository roomRepository;
-
     @Mock
     private HotelRepository hotelRepository;
-
     @Mock
     private RoomMapper roomMapper;
-
     @InjectMocks
     private RoomService roomService;
 

@@ -1,6 +1,5 @@
 package com.akm.hotelmanagement.wrapper;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

@@ -21,9 +21,7 @@ import static org.springframework.data.jpa.domain.Specification.where;
 @Service
 @RequiredArgsConstructor
 public class AmenityService {
-
     private final AmenityRepository amenityRepository;
-
     private final AmenityMapper amenityMapper;
 
     @Transactional
@@ -57,26 +55,48 @@ public class AmenityService {
     }
 
     @Transactional(readOnly = true)
-    public Page<AmenityResponseDto> getAmenitiesByHotelId(Long hotelId, Pageable pageable) {
+    public Page<AmenityResponseDto> getAmenitiesByHotelId(Long hotelId, Pageable pageable, String filterBy, String filterValue) {
+        if (filterBy == null || filterValue == null) {
+            return amenityRepository.findAll(
+                    where(
+                            AmenitySpecifications.hasFilter(
+                                    "hotel-id",
+                                    hotelId.toString()
+                            )
+                    ),
+                    pageable
+            ).map(amenityMapper::toResponseDto);
+        }
         return amenityRepository.findAll(
                 where(
                         AmenitySpecifications.hasFilter(
                                 "hotel-id",
                                 hotelId.toString()
-                        )
+                        ).and(AmenitySpecifications.hasFilter(filterBy, filterValue))
                 ),
                 pageable
         ).map(amenityMapper::toResponseDto);
     }
 
     @Transactional(readOnly = true)
-    public Page<AmenityResponseDto> getAmenitiesByRoomId(Long roomId, Pageable pageable) {
+    public Page<AmenityResponseDto> getAmenitiesByRoomId(Long roomId, Pageable pageable, String filterBy, String filterValue) {
+        if (filterBy == null || filterValue == null) {
+            return amenityRepository.findAll(
+                    where(
+                            AmenitySpecifications.hasFilter(
+                                    "room-id",
+                                    roomId.toString()
+                            )
+                    ),
+                    pageable
+            ).map(amenityMapper::toResponseDto);
+        }
         return amenityRepository.findAll(
                 where(
                         AmenitySpecifications.hasFilter(
                                 "room-id",
                                 roomId.toString()
-                        )
+                        ).and(AmenitySpecifications.hasFilter(filterBy, filterValue))
                 ),
                 pageable
         ).map(amenityMapper::toResponseDto);

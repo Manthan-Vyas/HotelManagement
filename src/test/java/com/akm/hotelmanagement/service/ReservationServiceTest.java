@@ -29,26 +29,19 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
-
     @Mock
     private ReservationRepository reservationRepository;
-
     @Mock
     private RoomRepository roomRepository;
-
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private ReservationMapper reservationMapper;
-
     @InjectMocks
     private ReservationService reservationService;
 
