@@ -43,6 +43,10 @@ public class ReservationService {
         if (dto.getNumberOfGuests() > room.getCapacity()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Number of guests exceeds room capacity");
         }
+        if (reservationRepository.existsByRoomIdAndCheckInLessThanEqualAndCheckOutGreaterThanEqual(
+                roomId, dto.getCheckOut(), dto.getCheckIn())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Room is already reserved for the given dates");
+        }
 
         Reservation reservation = new Reservation();
         reservation.setCheckIn(dto.getCheckIn());

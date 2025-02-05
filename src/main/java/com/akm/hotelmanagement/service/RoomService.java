@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.springframework.data.jpa.domain.Specification.where;
@@ -88,6 +89,16 @@ public class RoomService {
                         pageable
                 )
                 .map(roomMapper::toResponseDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RoomResponseDto> getAvailableRooms(LocalDate checkIn, LocalDate checkOut, int noOfGuests, Pageable pageable, String filterBy, String filterValue) {
+        if (filterBy == null || filterValue == null) {
+            return roomRepository.findAvailableRooms(checkIn, checkOut, noOfGuests, pageable, null).map(roomMapper::toResponseDto);
+        }
+        return roomRepository.findAvailableRooms(
+                checkIn, checkOut, noOfGuests, pageable, where(RoomSpecification.hasFilter(filterBy, filterValue))
+        ).map(roomMapper::toResponseDto);
     }
 
     @Transactional(readOnly = true)

@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
+
 import static com.akm.hotelmanagement.util.Constants.*;
 import static com.akm.hotelmanagement.util.Utils.getPageable;
 
@@ -236,6 +238,33 @@ public abstract class BaseController {
                         ).map(roomModelAssembler::toModel),
                         request
                 )
+        );
+    }
+
+    @GetMapping("/rooms/available")
+    @Operation(summary = "Get available rooms", description = "Get available rooms based on check-in, check-out dates, and number of guests with pagination, sorting, and filtering options")
+    public ResponseEntity<ResponseWrapper<PagedResponse<RoomModel>>> getAvailableRooms(
+            @RequestParam LocalDate checkIn,
+            @RequestParam LocalDate checkOut,
+            @RequestParam int noOfGuests,
+            @RequestParam(defaultValue = DEFAULT_PAGE_NUMBER) int page,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(defaultValue = DEFAULT_ROOM_SORT_BY) String sortBy,
+            @RequestParam(defaultValue = DEFAULT_SORT_DIR) String sortDir,
+            @RequestParam(required = false) String filterBy,
+            @RequestParam(required = false) String filterValue,
+            @Nullable HttpServletRequest request
+    ) {
+        Page<RoomModel> responseData = roomService.getAvailableRooms(
+                checkIn, checkOut, noOfGuests, getPageable(page, size, sortBy, sortDir), filterBy, filterValue
+        ).map(roomModelAssembler::toModel);
+        if (responseData.isEmpty()) {
+            return ResponseEntity.ok(
+                    ResponseWrapper.getNoContentResponseWrapper(request)
+            );
+        }
+        return ResponseEntity.ok(
+                ResponseWrapper.getOkResponseWrapperPaged(responseData, request)
         );
     }
 
