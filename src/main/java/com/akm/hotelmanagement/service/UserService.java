@@ -8,8 +8,8 @@ import com.akm.hotelmanagement.entity.util.UserRole;
 import com.akm.hotelmanagement.exception.ResourceAlreadyExistsException;
 import com.akm.hotelmanagement.exception.ResourceNotFoundException;
 import com.akm.hotelmanagement.filter.UserSpecifications;
-import com.akm.hotelmanagement.repository.UserRepository;
 import com.akm.hotelmanagement.mapper.UserMapper;
+import com.akm.hotelmanagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,10 +27,8 @@ import static org.springframework.data.jpa.domain.Specification.where;
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final UserMapper userMapper;
 
     @Transactional

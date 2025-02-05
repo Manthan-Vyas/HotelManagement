@@ -32,7 +32,6 @@ import static com.akm.hotelmanagement.util.Utils.getPageable;
 @RequestMapping("/admin")
 @Tag(name = "Admin", description = "Admin operations")
 public class AdminController extends AdminBaseController {
-
     private final UserService userService;
     private final UserModelAssembler userModelAssembler;
 

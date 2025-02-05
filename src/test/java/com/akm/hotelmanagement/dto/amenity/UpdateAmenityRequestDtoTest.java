@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UpdateAmenityRequestDtoTest {
-
     private static Validator validator;
 
     @BeforeAll
@@ -71,5 +70,4 @@ public class UpdateAmenityRequestDtoTest {
         assertEquals(1, violations.size());
         assertEquals("{error.amenity.description.size}", violations.iterator().next().getMessageTemplate());
     }
-
 }

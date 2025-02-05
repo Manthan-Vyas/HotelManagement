@@ -1,8 +1,8 @@
 package com.akm.hotelmanagement.mapper;
 
 import com.akm.hotelmanagement.dto.hotel.CreateHotelRequestDto;
-import com.akm.hotelmanagement.dto.hotel.UpdateHotelRequestDto;
 import com.akm.hotelmanagement.dto.hotel.HotelResponseDto;
+import com.akm.hotelmanagement.dto.hotel.UpdateHotelRequestDto;
 import com.akm.hotelmanagement.entity.Amenity;
 import com.akm.hotelmanagement.entity.Hotel;
 import com.akm.hotelmanagement.entity.Room;
@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class HotelMapper {
-
     private final RoomRepository roomRepository;
     private final AmenityRepository amenityRepository;
 

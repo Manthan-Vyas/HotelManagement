@@ -24,10 +24,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 // info: one or more test might be failed since the test data is not randomly generated and may not satisfy the conditions for insertion in database but this is a rare case scenario. will fix it in the future.
 public class RoomSpecificationsTest {
-
     @PersistenceContext
     private EntityManager entityManager;
-
     @Autowired
     private RoomRepository roomRepository;
 

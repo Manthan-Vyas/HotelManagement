@@ -22,13 +22,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-
 @Validated
 @RestController
 @RequestMapping("/")
 @Tag(name = "Public", description = "Endpoints accessible to the public")
 public class PublicController extends BaseController {
-
     private final UserService userService;
     private final UserModelAssembler userModelAssembler;
     private final MessageSource messageSource;
@@ -43,7 +41,7 @@ public class PublicController extends BaseController {
     @GetMapping
     @Operation(summary = "Get welcome message", description = "Get a welcome message in the default language")
     public ResponseEntity<ResponseWrapper<String>> getWelcomeMessage(
-            @Nullable HttpServletRequest request
+            HttpServletRequest request
     ) {
         return ResponseEntity.ok(
                 ResponseWrapper.getOkResponseWrapper(

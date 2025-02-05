@@ -23,17 +23,16 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static com.akm.hotelmanagement.util.Constants.*;
-import static com.akm.hotelmanagement.util.Utils.*;
+import static com.akm.hotelmanagement.util.Utils.getPageable;
+import static com.akm.hotelmanagement.util.Utils.isAuthenticatedUser;
 
 @Validated
 @RestController
 @RequestMapping("/users")
 @Tag(name = "User", description = "Endpoints for user operations")
 public class UserController extends BaseController {
-
     private final UserService userService;
     private final ReservationService reservationService;
-
     private final UserModelAssembler userModelAssembler;
     private final ReservationModelAssembler reservationModelAssembler;
 
@@ -179,6 +178,9 @@ public class UserController extends BaseController {
             @PathVariable Long reservationId,
             @Nullable HttpServletRequest request
     ) {
+        if (isNotValidUserReservation(username, reservationId)) {
+            throw new AccessDeniedException("Access denied: You can only access your own data");
+        }
         return ResponseEntity.ok(
                 ResponseWrapper.getOkResponseWrapper(
                         hotelModelAssembler.toModel(
@@ -195,7 +197,7 @@ public class UserController extends BaseController {
             @PathVariable Long reservationId,
             @Nullable HttpServletRequest request
     ) {
-        if (isNotValidUserReservation(getCurrentUsername(), reservationId)) {
+        if (isNotValidUserReservation(username, reservationId)) {
             throw new AccessDeniedException("Access denied: You can only access your own data");
         }
         return ResponseEntity.ok(

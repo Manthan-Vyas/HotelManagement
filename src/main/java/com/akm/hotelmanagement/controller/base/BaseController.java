@@ -26,7 +26,6 @@ import static com.akm.hotelmanagement.util.Utils.getPageable;
 
 @AllArgsConstructor
 public abstract class BaseController {
-
     protected final AmenityService amenityService;
     protected final AmenityModelAssembler amenityModelAssembler;
     protected final HotelService hotelService;

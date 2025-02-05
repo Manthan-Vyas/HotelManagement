@@ -18,7 +18,6 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 public class DataInitializer {
-
     private final UserRepository userRepository;
     private final AmenityRepository amenityRepository;
     private final HotelRepository hotelRepository;
@@ -228,5 +227,4 @@ public class DataInitializer {
         )));
         return hotel1;
     }
-
 }

@@ -25,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AmenitySpecificationsTest {
     @PersistenceContext
     private EntityManager entityManager;
-
     @Autowired
     private AmenityRepository amenityRepository;
 

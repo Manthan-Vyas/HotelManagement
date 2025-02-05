@@ -28,7 +28,6 @@ import static com.akm.hotelmanagement.util.Constants.*;
 import static com.akm.hotelmanagement.util.Utils.getPageable;
 
 public class AdminBaseController extends BaseController {
-
     protected final ReservationService reservationService;
     protected final ReservationModelAssembler reservationModelAssembler;
 
@@ -166,5 +165,4 @@ public class AdminBaseController extends BaseController {
                 )
         );
     }
-
 }

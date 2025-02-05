@@ -15,7 +15,6 @@ import java.util.HashSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HotelMapperTest {
-
     private HotelMapper hotelMapper;
 
     @BeforeEach

@@ -6,7 +6,6 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ImportResource;
 
 import java.util.Set;
@@ -17,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ImportResource("classpath:messages")
 public class CreateUserRequestDtoTest {
-
     private static Validator validator;
 
     @BeforeAll
@@ -117,5 +115,4 @@ public class CreateUserRequestDtoTest {
         assertEquals(1, violations.size());
         assertEquals("{error.invalid.phone.pattern}", violations.iterator().next().getMessage());
     }
-
 }

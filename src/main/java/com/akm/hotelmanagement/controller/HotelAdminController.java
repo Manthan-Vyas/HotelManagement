@@ -38,7 +38,6 @@ import static com.akm.hotelmanagement.util.Utils.getPageable;
 @RequestMapping("/hotel-admin")
 @Tag(name = "Hotel Admin", description = "Operations pertaining to hotel administration")
 public class HotelAdminController extends AdminBaseController {
-
     public HotelAdminController(AmenityService amenityService, AmenityModelAssembler amenityModelAssembler, HotelService hotelService, HotelModelAssembler hotelModelAssembler, RoomService roomService, RoomModelAssembler roomModelAssembler, ReservationService reservationService, ReservationModelAssembler reservationModelAssembler) {
         super(amenityService, amenityModelAssembler, hotelService, hotelModelAssembler, roomService, roomModelAssembler, reservationService, reservationModelAssembler);
     }

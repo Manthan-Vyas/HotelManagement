@@ -14,5 +14,4 @@ public class Constants {
     public static final String DEFAULT_ROOM_SORT_BY = "number";
     public static final String DEFAULT_RESERVATION_SORT_BY = "checkIn";
     public static final String DEFAULT_USER_SORT_BY = "username";
-
 }
