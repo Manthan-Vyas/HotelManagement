@@ -192,6 +192,7 @@ public class UserController extends BaseController {
     }
 
     @GetMapping("/{username}/reservations/{reservationId}/room")
+    @Operation(summary = "Get room by reservation ID", description = "Get the room details of a reservation by providing the reservation ID")
     public ResponseEntity<ResponseWrapper<RoomModel>> getRoomByReservationId(
             @PathVariable String username,
             @PathVariable Long reservationId,
