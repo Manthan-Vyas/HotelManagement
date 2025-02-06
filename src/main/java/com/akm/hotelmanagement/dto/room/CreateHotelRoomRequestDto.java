@@ -9,6 +9,8 @@ import lombok.Value;
 import java.io.Serializable;
 import java.util.Set;
 
+import static com.akm.hotelmanagement.util.Constants.*;
+
 /**
  * DTO for {@link Room}
  */
@@ -16,10 +18,10 @@ import java.util.Set;
 public class CreateHotelRoomRequestDto implements Serializable {
     @Positive(message = "{error.room.number.positive}")
     int number;
-    @Size(message = "{error.room.type.size}", min = 1, max = 50)
+    @Size(message = "{error.room.type.size}", min = ROOM_TYPE_MIN_LENGTH, max = ROOM_TYPE_MAX_LENGTH)
     @NotBlank(message = "{error.room.type.required}")
     String type;
-    @Size(message = "{error.room.description.size}", min = 5, max = 200)
+    @Size(message = "{error.room.description.size}", min = ROOM_DESCRIPTION_MIN_LENGTH, max = ROOM_DESCRIPTION_MAX_LENGTH)
     @NotBlank(message = "{error.required.description}")
     String description;
     @Positive(message = "{error.room.capacity.positive}")

@@ -11,30 +11,33 @@ import org.springframework.lang.Nullable;
 import java.io.Serializable;
 import java.util.Set;
 
+import static com.akm.hotelmanagement.util.Constants.*;
+
 /**
  * DTO for {@link com.akm.hotelmanagement.entity.Hotel}
  */
 @Value
 public class UpdateHotelRequestDto implements Serializable {
     @NullableNotBlank(message = "{error.nullable.blank.name}")
-    @Size(min = 2, max = 50, message = "{error.hotel.name.size}")
+    @Size(min = HOTEL_NAME_MIN_LENGTH, max = HOTEL_NAME_MAX_LENGTH, message = "{error.hotel.name.size}")
+    @Pattern(regexp = NAME_PATTERN, message = "{error.invalid.name.pattern}")
     String name;
     @NullableNotBlank(message = "{error.nullable.blank.address}")
-    @Size(min = 5, max = 100, message = "{error.hotel.address.size}")
+    @Size(min = HOTEL_ADDRESS_MIN_LENGTH, max = HOTEL_ADDRESS_MAX_LENGTH, message = "{error.hotel.address.size}")
     String address;
     @NullableNotBlank(message = "{error.nullable.blank.city}")
-    @Size(min = 2, max = 50, message = "{error.hotel.city.size}")
+    @Size(min = HOTEL_CITY_MIN_LENGTH, max = HOTEL_CITY_MAX_LENGTH, message = "{error.hotel.city.size}")
     String city;
     @NullableNotBlank(message = "{error.nullable.blank.state}")
-    @Size(min = 2, max = 50, message = "{error.hotel.state.size}")
+    @Size(min = HOTEL_STATE_MIN_LENGTH, max = HOTEL_STATE_MAX_LENGTH, message = "{error.hotel.state.size}")
     String state;
     @NullableNotBlank(message = "{error.nullable.blank.zip}")
-    @Pattern(regexp = "^\\d{6}$", message = "{error.invalid.zip.pattern}")
+    @Pattern(regexp = ZIP_PATTERN, message = "{error.invalid.zip.pattern}")
     String zip;
     @NullableNotBlank(message = "{error.nullable.blank.description}")
-    @Size(min = 5, max = 200, message = "{error.hotel.description.size}")
+    @Size(min = HOTEL_DESCRIPTION_MIN_LENGTH, max = HOTEL_DESCRIPTION_MAX_LENGTH, message = "{error.hotel.description.size}")
     String description;
-    @Max(value = 5, message = "{error.hotel.rating}")
+    @Max(value = HOTEL_RATING_MAX_INT, message = "{error.hotel.rating}")
     @PositiveOrZero(message = "{error.hotel.rating}")
     @Nullable
     Double rating;
