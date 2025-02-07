@@ -146,6 +146,13 @@ public class ReservationService {
     @Transactional
     public ReservationResponseDto updateReservation(Long id, CreateOrUpdateUserRoomReservationRequestDto dto) {
         Reservation reservation = reservationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + id));
+        if (reservation.getStatus() != ReservationStatus.PENDING) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reservation already processed and cannot be updated");
+        }
+        if (dto.getCheckIn().equals(reservation.getCheckIn()) && dto.getCheckOut().equals(reservation.getCheckOut())
+                && dto.getNumberOfGuests() == reservation.getNumberOfGuests()) {
+            throw new ResourceAlreadyExistsException("Reservation already has the same details");
+        }
         reservation.setCheckIn(dto.getCheckIn());
         reservation.setCheckOut(dto.getCheckOut());
         reservation.setNumberOfGuests(dto.getNumberOfGuests());
@@ -181,6 +188,9 @@ public class ReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + reservationId));
         if (reservation.getStatus() == ReservationStatus.CANCELLED || reservation.getStatus() == ReservationStatus.CANCELLED_BY_USER) {
             throw new ResourceAlreadyExistsException("Reservation already cancelled");
+        }
+        if (reservation.getStatus() == ReservationStatus.CHECKED_IN || reservation.getStatus() == ReservationStatus.CHECKED_OUT) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel reservation that is already checked in or checked out");
         }
         reservation.setStatus(ReservationStatus.CANCELLED);
         return reservationMapper.toResponseDto(reservationRepository.save(reservation));

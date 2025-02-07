@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
+import java.util.Objects;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
@@ -87,20 +87,15 @@ public class HotelService {
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id: " + id));
 
-        if (!isPut) {
+        if (isPut) {
+            if (areAllFieldsEqual(dto, hotel)) {
+                throw new ResourceAlreadyExistsException("All fields are same as the existing one");
+            }
+        } else {
             checkForDuplicateFields(dto, hotel);
-            updateHotelFields(dto, hotel);
-            return hotelMapper.toResponseDto(hotelRepository.save(hotel));
         }
 
-        hotel.setName(dto.getName());
-        hotel.setAddress(dto.getAddress());
-        hotel.setCity(dto.getCity());
-        hotel.setState(dto.getState());
-        hotel.setZip(dto.getZip());
-        hotel.setDescription(dto.getDescription());
-        hotel.setRating(Optional.ofNullable(dto.getRating()).orElse(hotel.getRating()));
-        hotel.setImageUrls(dto.getImageUrls());
+        updateHotelFields(dto, hotel);
         return hotelMapper.toResponseDto(hotelRepository.save(hotel));
     }
 
@@ -156,6 +151,17 @@ public class HotelService {
         if (dto.getImageUrls() != null && dto.getImageUrls().equals(hotel.getImageUrls())) {
             throw new ResourceAlreadyExistsException("ImageUrls is same as the existing one " + dto.getImageUrls());
         }
+    }
+
+    private boolean areAllFieldsEqual(UpdateHotelRequestDto dto, Hotel hotel) {
+        return Objects.equals(dto.getName(), hotel.getName()) &&
+                Objects.equals(dto.getAddress(), hotel.getAddress()) &&
+                Objects.equals(dto.getCity(), hotel.getCity()) &&
+                Objects.equals(dto.getState(), hotel.getState()) &&
+                Objects.equals(dto.getZip(), hotel.getZip()) &&
+                Objects.equals(dto.getDescription(), hotel.getDescription()) &&
+                Objects.equals(dto.getRating(), hotel.getRating()) &&
+                Objects.equals(dto.getImageUrls(), hotel.getImageUrls());
     }
 
     private void updateHotelFields(UpdateHotelRequestDto dto, Hotel hotel) {

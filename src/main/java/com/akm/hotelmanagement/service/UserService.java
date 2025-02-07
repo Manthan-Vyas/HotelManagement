@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Objects;
+
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
@@ -117,17 +119,15 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
-        if (!isPut) {
+        if (isPut) {
+            if (areAllFieldsEqual(dto, user)) {
+                throw new ResourceAlreadyExistsException("All fields are same as the existing one");
+            }
+        } else {
             checkForDuplicateFields(dto, user);
-            updateUserFields(dto, user);
-            return userMapper.toResponseDto(userRepository.save(user));
         }
-        // todo: check if another user exists with email or password provided in dto
-        user.setUsername(dto.getUsername());
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setPhone(dto.getPhone());
+
+        updateUserFields(dto, user);
         return userMapper.toResponseDto(userRepository.save(user));
     }
 
@@ -188,6 +188,14 @@ public class UserService implements UserDetailsService {
                     "Phone number is same as the existing one " + dto.getPhone()
             );
         }
+    }
+
+    private boolean areAllFieldsEqual(UpdateUserRequestDto dto, User user) {
+        return Objects.equals(dto.getUsername(), user.getUsername()) &&
+                Objects.equals(dto.getName(), user.getName()) &&
+                Objects.equals(dto.getEmail(), user.getEmail()) &&
+                passwordEncoder.matches(dto.getPassword(), user.getPassword()) &&
+                Objects.equals(dto.getPhone(), user.getPhone());
     }
 
     private void updateUserFields(UpdateUserRequestDto dto, User user) {

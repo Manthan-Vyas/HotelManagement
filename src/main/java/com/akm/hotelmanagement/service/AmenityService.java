@@ -104,22 +104,30 @@ public class AmenityService {
 
     @Transactional
     public AmenityResponseDto updateAmenity(Long id, UpdateAmenityRequestDto dto, boolean isPut) {
-        if (isPut && dto.hasAnyFieldNull()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "All fields are required for PUT request"
-            );
-        }
-        if (!isPut && dto.hasAllFieldsNull()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "At least one field is required for PATCH request"
-            );
-        }
         Amenity amenity = amenityRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Amenity not found with id: " + id));
-        if (!isPut) {
-            if (dto.getName() != null && amenity.getName().equals(dto.getName())) {
+
+        if (isPut) {
+            if (dto.hasAnyFieldNull()) {
+                throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "All fields are required for PUT request"
+                );
+            }
+            if (dto.getName().equals(amenity.getName()) && dto.getDescription().equals(amenity.getDescription())) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Name and Description are same as the existing ones"
+                );
+            }
+        } else {
+            if (dto.hasAllFieldsNull()) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "At least one field is required for PATCH request"
+                );
+            }
+            if (dto.getName() != null && dto.getName().equals(amenity.getName())) {
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
                         "Name is same as the existing one"
@@ -131,16 +139,15 @@ public class AmenityService {
                         "Description is same as the existing one"
                 );
             }
-            if (dto.getName() != null) {
-                amenity.setName(dto.getName());
-            }
-            if (dto.getDescription() != null) {
-                amenity.setDescription(dto.getDescription());
-            }
-            return amenityMapper.toResponseDto(amenityRepository.save(amenity));
         }
-        amenity.setName(dto.getName());
-        amenity.setDescription(dto.getDescription());
+
+        if (dto.getName() != null) {
+            amenity.setName(dto.getName());
+        }
+        if (dto.getDescription() != null) {
+            amenity.setDescription(dto.getDescription());
+        }
+
         return amenityMapper.toResponseDto(amenityRepository.save(amenity));
     }
 

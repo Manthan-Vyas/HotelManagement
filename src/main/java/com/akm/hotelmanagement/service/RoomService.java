@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.Objects;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
@@ -167,18 +167,15 @@ public class RoomService {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with Id: " + id));
 
-        if (!isPut) {
+        if (isPut) {
+            if (areAllFieldsEqual(dto, room)) {
+                throw new ResourceAlreadyExistsException("All fields are same as the existing one");
+            }
+        } else {
             checkForDuplicateFields(dto, room);
-            updateRoomFields(dto, room);
-            return roomMapper.toResponseDto(roomRepository.save(room));
         }
 
-        room.setNumber(Optional.ofNullable(dto.getNumber()).orElse(room.getNumber()));
-        room.setType(dto.getType());
-        room.setDescription(dto.getDescription());
-        room.setCapacity(Optional.ofNullable(dto.getCapacity()).orElse(room.getCapacity()));
-        room.setPricePerNight(Optional.ofNullable(dto.getPricePerNight()).orElse(room.getPricePerNight()));
-        room.setImageUrls(dto.getImageUrls());
+        updateRoomFields(dto, room);
         return roomMapper.toResponseDto(roomRepository.save(room));
     }
 
@@ -235,6 +232,15 @@ public class RoomService {
                     "Room image URLs are the same as the existing ones"
             );
         }
+    }
+
+    private boolean areAllFieldsEqual(UpdateHotelRoomRequestDto dto, Room room) {
+        return Objects.equals(dto.getNumber(), room.getNumber()) &&
+                Objects.equals(dto.getType(), room.getType()) &&
+                Objects.equals(dto.getDescription(), room.getDescription()) &&
+                Objects.equals(dto.getCapacity(), room.getCapacity()) &&
+                Objects.equals(dto.getPricePerNight(), room.getPricePerNight()) &&
+                Objects.equals(dto.getImageUrls(), room.getImageUrls());
     }
 
     private void updateRoomFields(UpdateHotelRoomRequestDto dto, Room room) {
