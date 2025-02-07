@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -145,6 +146,21 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with username " + username));
         user.setEnabled(enabled);
         return userMapper.toResponseDto(userRepository.save(user));
+    }
+
+    @Transactional
+    public boolean changeUserPassword(String emailOrUsername, @Nullable String oldPassword, String newPassword) {
+        User user = userRepository.findByUsername(emailOrUsername)
+                .orElseGet(() -> userRepository.findByEmail(emailOrUsername)
+                        .orElseThrow(() -> new ResourceNotFoundException("User not found with username or email: " + emailOrUsername)));
+
+        if (oldPassword != null && !passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Old password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return true;
     }
 
     @Transactional(readOnly = true)

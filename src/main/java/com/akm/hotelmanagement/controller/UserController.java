@@ -10,12 +10,14 @@ import com.akm.hotelmanagement.dto.reservation.CreateOrUpdateUserRoomReservation
 import com.akm.hotelmanagement.dto.user.UpdateUserRequestDto;
 import com.akm.hotelmanagement.dto.user.UserResponseDto;
 import com.akm.hotelmanagement.service.*;
+import com.akm.hotelmanagement.validation.NullableNotBlank;
 import com.akm.hotelmanagement.wrapper.PagedResponse;
 import com.akm.hotelmanagement.wrapper.ResponseWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
@@ -102,6 +104,29 @@ public class UserController extends BaseController {
                 )
         );
     }
+
+    @PatchMapping("/forgot-password")
+    @Operation(summary = "Forgot password", description = "Generate a password reset token and send it to the user's email or username")
+    public ResponseEntity<ResponseWrapper<String>> forgotPassword(
+            @RequestParam String emailOrUsername,
+            @RequestParam @NullableNotBlank(message = "{error.nullable.blank.password}")
+            @Pattern(
+                    regexp = PASSWORD_PATTERN,
+                    message = "{error.invalid.password.pattern}"
+            ) String newPassword,
+            @Nullable HttpServletRequest request
+    ) {
+        if (userService.changeUserPassword(emailOrUsername, null, newPassword)) {
+            return ResponseEntity.ok(
+                    ResponseWrapper.getOkResponseWrapper(
+                            "Password reset successful",
+                            request
+                    )
+            );
+        } else {
+            throw new IllegalArgumentException("Password reset failed");
+        }
+    } // todo: handle error from server
 
     @PostMapping("/{username}/reservations/{roomId}")
     @Operation(summary = "Book a room", description = "Book a room by providing the username, room ID, and the required details as a CreateOrUpdateUserRoomReservationRequestDto JSON object in the request body")
