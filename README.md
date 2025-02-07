@@ -1,11 +1,49 @@
 # Hotel Management System
 
->**<span style="color:red;">Note: This project is still under development and needs many fixes</span>**
+>**<span style="color:red;">Note: This project is still under development and needs many fixes.</span>**
+## Project Status: Active Development 🚧
 
+This project is currently under **active development**, meaning new features and improvements are being added frequently. As a result:
+
+- There are **small bugs** and unfinished features that are being addressed.
+- The **test suite is outdated**, as changes have been made after the initial tests were written.
+- As the developer, I am currently **learning how to write tests in Spring Boot**, so testing is an ongoing improvement process.
+- Some features have been **manually tested and are working**, but automated tests may not fully cover them yet.
 
 ## Overview
 
 This is a Hotel Management System built with Java, Spring Boot, and Maven. It is just a demo project for managing hotel reservations, users, and rooms. The project includes various features such as HATEOAS, ResponseWrapper, internationalization (i18n), security, role-based authorization, custom validations, filters, exception handling, and mappers.
+
+## Steps to Run the Project Locally
+### Running the Project
+To check out the project, clone the **`run-local`** branch and follow the setup instructions to run it locally. Feedback and contributions are welcome!
+
+### Project Requirements
+- Java 23
+
+### 1. Clone the Repository
+Clone the project repository from GitHub to your local machine and switch to the `run-local` branch.
+```sh
+git clone "https://github.com/Manthan-Vyas/HotelManagement.git"
+cd <repository-directory>
+git checkout run-local
+```
+
+### 2. Open the Project in IntelliJ IDEA
+Open IntelliJ IDEA and select "Open" from the welcome screen. Navigate to the project directory and open it.
+
+### 3. Start the Application from IntelliJ IDEA
+
+### 4. Access the Application
+Once the application is running, you can access it via `http://localhost:8080`. and the Swagger UI can be accessed via `http://localhost:8080/swagger-ui/index.html`.
+
+### 5. Access the H2 Console
+To access the H2 console, navigate to `http://localhost:8080/h2-console`. Use the following credentials:
+- **JDBC URL**: `jdbc:h2:mem:testdb`
+- **Username**: `sa`
+- **Password**: `password`
+
+The application will be ready to use with the default configurations.
 
 ## Key Features
 
