@@ -27,10 +27,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 import static com.akm.hotelmanagement.util.Constants.*;
+import static com.akm.hotelmanagement.util.Utils.getCurrentUsername;
 import static com.akm.hotelmanagement.util.Utils.getPageable;
 
 @Validated
@@ -60,6 +64,7 @@ public class HotelAdminController extends AdminBaseController {
             @Valid @RequestBody CreateHotelRoomRequestDto dto,
             @Nullable HttpServletRequest request
     ) {
+        validHotelAdminCheck(hotelId);
         if (roomService.getRoomByHotelIdAndRoomNumber(hotelId, dto.getNumber()) != null) {
             throw new ResourceAlreadyExistsException("Room " + dto.getNumber() + " already exists in hotel with id: " + hotelId);
         }
@@ -81,6 +86,7 @@ public class HotelAdminController extends AdminBaseController {
             @PathVariable Long roomId,
             @Nullable HttpServletRequest request
     ) {
+        validHotelAdminCheck(hotelId);
         if(isNotValidHotelRoom(hotelId, roomId)) {
             throw new ResourceNotFoundException("Room not found with id: " + roomId);
         }
@@ -106,6 +112,7 @@ public class HotelAdminController extends AdminBaseController {
             @RequestParam(required = false) String filterValue,
             @Nullable HttpServletRequest request
     ) {
+        validHotelAdminCheck(hotelId);
         if (hotelService.getHotelById(hotelId) == null) {
             throw new ResourceNotFoundException("Hotel not found with id: " + hotelId);
         }
@@ -135,6 +142,7 @@ public class HotelAdminController extends AdminBaseController {
             @RequestParam(required = false) String filterValue,
             @Nullable HttpServletRequest request
     ) {
+        validHotelAdminCheck(hotelId);
         if (isNotValidHotelRoom(hotelId, roomId)) {
             throw new ResourceNotFoundException("Room not found with id: " + roomId);
         }
@@ -159,6 +167,7 @@ public class HotelAdminController extends AdminBaseController {
             @PathVariable Long reservationId,
             @Nullable HttpServletRequest request
     ) {
+        validHotelAdminCheck(hotelId);
         if (isNotValidHotelRoomReservation(hotelId, roomId, reservationId)) {
             throw new ResourceNotFoundException("Reservation not found with id: " + reservationId);
         }
@@ -180,6 +189,7 @@ public class HotelAdminController extends AdminBaseController {
             @PathVariable Long reservationId,
             @Nullable HttpServletRequest request
     ) {
+        validHotelAdminCheck(hotelId);
         if(isNotValidHotelRoomReservation(hotelId, roomId, reservationId)) {
             throw new ResourceNotFoundException("Room not found with reservation id: " + reservationId);
         }
@@ -202,6 +212,7 @@ public class HotelAdminController extends AdminBaseController {
             @PathVariable Long reservationId,
             @Nullable HttpServletRequest request
     ) {
+        validHotelAdminCheck(hotelId);
         if (isNotValidHotelRoomReservation(hotelId, roomId, reservationId)) {
             throw new ResourceNotFoundException("Reservation not found with id: " + reservationId);
         }
@@ -227,6 +238,7 @@ public class HotelAdminController extends AdminBaseController {
             @Valid @RequestBody UpdateHotelRequestDto dto,
             @Nullable HttpServletRequest request
     ) {
+        validHotelAdminCheck(hotelId);
         return ResponseEntity.ok(
                 ResponseWrapper.getOkResponseWrapper(
                         hotelModelAssembler.toModel(
@@ -244,6 +256,7 @@ public class HotelAdminController extends AdminBaseController {
             @Valid @RequestBody UpdateHotelRequestDto dto,
             @Nullable HttpServletRequest request
     ) {
+        validHotelAdminCheck(hotelId);
         return ResponseEntity.ok(
                 ResponseWrapper.getOkResponseWrapper(
                         hotelModelAssembler.toModel(
@@ -261,6 +274,7 @@ public class HotelAdminController extends AdminBaseController {
             @Valid @RequestBody UpdateHotelRoomRequestDto dto,
             @Nullable HttpServletRequest request
     ) {
+        validHotelAdminCheck(hotelId);
         if (isNotValidHotelRoom(hotelId, roomId)) {
             throw new ResourceNotFoundException("Room not found with id: " + roomId);
         }
@@ -281,6 +295,7 @@ public class HotelAdminController extends AdminBaseController {
             @Valid @RequestBody UpdateHotelRoomRequestDto dto,
             @Nullable HttpServletRequest request
     ) {
+        validHotelAdminCheck(hotelId);
         if (isNotValidHotelRoom(hotelId, roomId)) {
             throw new ResourceNotFoundException("Room not found with id: " + roomId);
         }
@@ -301,6 +316,7 @@ public class HotelAdminController extends AdminBaseController {
             @RequestParam String status,
             @Nullable HttpServletRequest request
     ) {
+        validHotelAdminCheck(hotelId);
         if (isNotValidHotelRoom(hotelId, roomId)) {
             throw new ResourceNotFoundException("Room not found with id: " + roomId);
         }
@@ -326,6 +342,7 @@ public class HotelAdminController extends AdminBaseController {
             @PathVariable Long roomId,
             @Nullable HttpServletRequest request
     ) {
+        validHotelAdminCheck(hotelId);
         if (isNotValidHotelRoom(hotelId, roomId)) {
             throw new ResourceNotFoundException("Room not found with id: " + roomId);
         }
@@ -335,6 +352,17 @@ public class HotelAdminController extends AdminBaseController {
                         request
                 )
         );
+    }
+
+    private void validHotelAdminCheck(Long hotelId) {
+        if (isNotValidHotelAdmin(hotelId, getCurrentUsername())) {
+            // throw unauthorized access
+            throw new AccessDeniedException("Unauthorized access");
+        }
+    }
+
+    private boolean isNotValidHotelAdmin(Long hotelId, String username) {
+        return !Objects.equals(hotelService.getHotelsByAdminUsername(username).stream().anyMatch(hotel -> hotel.getId().equals(hotelId)), true);
     }
 
     private boolean isNotValidHotelRoom(Long hotelId, Long roomId) {

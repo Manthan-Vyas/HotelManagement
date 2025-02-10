@@ -71,6 +71,16 @@ public class DataInitializer {
             hotelAdmin.setEnabled(true);
             userRepository.save(hotelAdmin);
 
+            User hotelAdmin2 = new User();
+            hotelAdmin2.setName("Hotel Admin 2");
+            hotelAdmin2.setUsername("hotel2");
+            hotelAdmin2.setPassword(passwordEncoder.encode("toor"));
+            hotelAdmin2.setRole(UserRole.HOTEL_ADMIN);
+            hotelAdmin2.setEmail("hotel2admin@example.com");
+            hotelAdmin2.setPhone("0987654322");
+            hotelAdmin2.setEnabled(true);
+            userRepository.save(hotelAdmin2);
+
             User user = new User();
             user.setName("User");
             user.setUsername("user");
@@ -80,6 +90,16 @@ public class DataInitializer {
             user.setPhone("1122334455");
             user.setEnabled(true);
             userRepository.save(user);
+
+            User user2 = new User();
+            user2.setName("User 2");
+            user2.setUsername("user2");
+            user2.setPassword(passwordEncoder.encode("toor"));
+            user2.setRole(UserRole.USER);
+            user2.setEmail("user2@example.com");
+            user2.setPhone("1122334456");
+            user2.setEnabled(true);
+            userRepository.save(user2);
 
             // Create Amenities
             Amenity wifi = new Amenity();
@@ -99,10 +119,10 @@ public class DataInitializer {
 
 
             // Create Hotels
-            Hotel hotel1 = getHotel(wifi, gym);
+            Hotel hotel1 = getHotel(List.of(wifi, gym), hotelAdmin);
             hotelRepository.save(hotel1);
 
-            Hotel hotel2 = getHotel2(wifi, pool);
+            Hotel hotel2 = getHotel2(List.of(wifi, pool), hotelAdmin2);
             hotelRepository.save(hotel2);
 
             // Create Rooms
@@ -190,7 +210,7 @@ public class DataInitializer {
         return room1;
     }
 
-    private static Hotel getHotel2(Amenity wifi, Amenity pool) {
+    private static Hotel getHotel2(List<Amenity> amenities, User admin) {
         Hotel hotel2 = new Hotel();
         hotel2.setName("Hotel Moonlight");
         hotel2.setAddress("456 Moonlight Ave, Moonville");
@@ -203,14 +223,12 @@ public class DataInitializer {
                 "http://example.com/hotel2/image1.jpg",
                 "http://example.com/hotel2/image2.jpg"
         )));
-        hotel2.setAmenities(new HashSet<>(List.of(
-                wifi,
-                pool
-        )));
+        hotel2.setAmenities(new HashSet<>(amenities));
+        hotel2.setAdmin(admin);
         return hotel2;
     }
 
-    private static Hotel getHotel(Amenity wifi, Amenity gym) {
+    private static Hotel getHotel(List<Amenity> amenities, User admin) {
         Hotel hotel1 = new Hotel();
         hotel1.setName("Hotel Sunshine");
         hotel1.setAddress("123 Sunshine St, Sunnyville");
@@ -223,10 +241,8 @@ public class DataInitializer {
                 "http://example.com/hotel1/image1.jpg",
                 "http://example.com/hotel1/image2.jpg"
         )));
-        hotel1.setAmenities(new HashSet<>(List.of(
-                wifi,
-                gym
-        )));
+        hotel1.setAmenities(new HashSet<>(amenities));
+        hotel1.setAdmin(admin);
         return hotel1;
     }
 }
