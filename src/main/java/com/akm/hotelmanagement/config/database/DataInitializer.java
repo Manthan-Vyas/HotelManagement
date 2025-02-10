@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Configuration
 @RequiredArgsConstructor
@@ -28,221 +29,140 @@ public class DataInitializer {
 
     @Bean
     public CommandLineRunner loadData() {
-        // load only if empty
         if (userRepository.count() > 0 || amenityRepository.count() > 0 || hotelRepository.count() > 0 || roomRepository.count() > 0 || reservationRepository.count() > 0) {
-            return args -> {
-            };
+            return _ -> {};
         }
-//        userRepository.deleteAll();
-//        amenityRepository.deleteAll();
-//        hotelRepository.deleteAll();
-//        roomRepository.deleteAll();
-//        reservationRepository.deleteAll();
 
-        return args -> {
+        return _ -> {
             // Create Users
-            User admin = new User();
-            admin.setName("Admin");
-            admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode("toor"));
-            admin.setRole(UserRole.ADMIN);
-            admin.setEmail("admin@example.com");
-            admin.setPhone("1234567890");
-            admin.setEnabled(true);
-            userRepository.save(admin);
-
-            User root = new User();
-            root.setName("Root");
-            root.setUsername("root");
-            root.setPassword(passwordEncoder.encode("toor"));
-            root.setRole(UserRole.ADMIN);
-            root.setEmail("root@example.com");
-            root.setPhone("1234567891");
-            root.setEnabled(true);
-            userRepository.save(root);
-
-            User hotelAdmin = new User();
-            hotelAdmin.setName("Hotel Admin");
-            hotelAdmin.setUsername("hotel");
-            hotelAdmin.setPassword(passwordEncoder.encode("toor"));
-            hotelAdmin.setRole(UserRole.HOTEL_ADMIN);
-            hotelAdmin.setEmail("hoteladmin@example.com");
-            hotelAdmin.setPhone("0987654321");
-            hotelAdmin.setEnabled(true);
-            userRepository.save(hotelAdmin);
-
-            User hotelAdmin2 = new User();
-            hotelAdmin2.setName("Hotel Admin 2");
-            hotelAdmin2.setUsername("hotel2");
-            hotelAdmin2.setPassword(passwordEncoder.encode("toor"));
-            hotelAdmin2.setRole(UserRole.HOTEL_ADMIN);
-            hotelAdmin2.setEmail("hotel2admin@example.com");
-            hotelAdmin2.setPhone("0987654322");
-            hotelAdmin2.setEnabled(true);
-            userRepository.save(hotelAdmin2);
-
-            User user = new User();
-            user.setName("User");
-            user.setUsername("user");
-            user.setPassword(passwordEncoder.encode("toor"));
-            user.setRole(UserRole.USER);
-            user.setEmail("user@example.com");
-            user.setPhone("1122334455");
-            user.setEnabled(true);
-            userRepository.save(user);
-
-            User user2 = new User();
-            user2.setName("User 2");
-            user2.setUsername("user2");
-            user2.setPassword(passwordEncoder.encode("toor"));
-            user2.setRole(UserRole.USER);
-            user2.setEmail("user2@example.com");
-            user2.setPhone("1122334456");
-            user2.setEnabled(true);
-            userRepository.save(user2);
+            createUsers();
 
             // Create Amenities
-            Amenity wifi = new Amenity();
-            wifi.setName("WiFi");
-            wifi.setDescription("High-speed internet");
-            amenityRepository.save(wifi);
+            List<Amenity> amenities = createAmenities();
 
-            Amenity pool = new Amenity();
-            pool.setName("Swimming Pool");
-            pool.setDescription("A pool for swimming");
-            amenityRepository.save(pool);
-
-            Amenity gym = new Amenity();
-            gym.setName("Gym");
-            gym.setDescription("Gym for fitness freaks");
-            amenityRepository.save(gym);
-
-
-            // Create Hotels
-            Hotel hotel1 = getHotel(List.of(wifi, gym), hotelAdmin);
-            hotelRepository.save(hotel1);
-
-            Hotel hotel2 = getHotel2(List.of(wifi, pool), hotelAdmin2);
-            hotelRepository.save(hotel2);
-
-            // Create Rooms
-            Room room1 = getRoom(hotel1);
-            roomRepository.save(room1);
-
-            Room room2 = getRoom2(hotel1);
-            roomRepository.save(room2);
-
-            Room room3 = getRoom3(hotel2);
-            roomRepository.save(room3);
+            // Create Hotels and Rooms
+            List<Hotel> hotels = createHotels(amenities);
+            createRooms(hotels);
 
             // Create Reservations
-            Reservation reservation1 = new Reservation();
-            reservation1.setUser(user);
-            reservation1.setRoom(room1);
-            reservation1.setCheckIn(LocalDate.of(2025, 1, 1));
-            reservation1.setCheckOut(LocalDate.of(2025, 1, 5));
-            reservation1.setReservationDate(LocalDate.now());
-            reservation1.setNumberOfGuests(2);
-            reservation1.setTotalPrice(400.0);
-            reservation1.setStatus(ReservationStatus.PENDING);
-            reservationRepository.save(reservation1);
-
-            Reservation reservation2 = new Reservation();
-            reservation2.setUser(user);
-            reservation2.setRoom(room3);
-            reservation2.setCheckIn(LocalDate.of(2025, 2, 1));
-            reservation2.setCheckOut(LocalDate.of(2025, 2, 3));
-            reservation2.setReservationDate(LocalDate.now());
-            reservation2.setTotalPrice(300);
-            reservation2.setStatus(ReservationStatus.CONFIRMED);
-            reservationRepository.save(reservation2);
+            createReservations();
         };
     }
 
-    private static Room getRoom3(Hotel hotel2) {
-        Room room3 = new Room();
-        room3.setHotel(hotel2);
-        room3.setNumber(201);
-        room3.setType("Suite");
-        room3.setPricePerNight(150.0);
-        room3.setCapacity(6);
-        room3.setStatus(RoomStatus.AVAILABLE);
-        room3.setDescription("A room that is a suite");
-        room3.setImageUrls(new HashSet<>(List.of(
-                "http://example.com/room3/image1.jpg",
-                "http://example.com/room3/image2.jpg"
-        )));
-        room3.setHotel(hotel2);
-        return room3;
+    private void createUsers() {
+        userRepository.saveAll(List.of(
+                createUser("Admin1", "admin1", "admin1@example.com", "1234567890", UserRole.ADMIN),
+                createUser("Admin2", "admin2", "admin2@example.com", "1234567891", UserRole.ADMIN),
+                createUser("Hotel Admin1", "hotel1", "hotel1admin@example.com", "0987654321", UserRole.HOTEL_ADMIN),
+                createUser("Hotel Admin2", "hotel2", "hotel2admin@example.com", "0987654322", UserRole.HOTEL_ADMIN),
+                createUser("Hotel Admin3", "hotel3", "hotel3admin@example.com", "0987654323", UserRole.HOTEL_ADMIN),
+                createUser("User1", "user1", "user1@example.com", "1122334455", UserRole.USER),
+                createUser("User2", "user2", "user2@example.com", "1122334456", UserRole.USER),
+                createUser("User3", "user3", "user3@example.com", "1122334457", UserRole.USER),
+                createUser("User4", "user4", "user4@example.com", "1122334458", UserRole.USER),
+                createUser("User5", "user5", "user5@example.com", "1122334459", UserRole.USER)
+        ));
     }
 
-    private static Room getRoom2(Hotel hotel1) {
-        Room room2 = new Room();
-        room2.setHotel(hotel1);
-        room2.setNumber(102);
-        room2.setType("Standard");
-        room2.setPricePerNight(80.0);
-        room2.setCapacity(2);
-        room2.setStatus(RoomStatus.AVAILABLE);
-        room2.setDescription("A room that is standard");
-        room2.setImageUrls(new HashSet<>(List.of(
-                "http://example.com/room2/image1.jpg",
-                "http://example.com/room2/image2.jpg"
-        )));
-        room2.setHotel(hotel1);
-        return room2;
+    private User createUser(String name, String username, String email, String phone, UserRole role) {
+        User user = new User();
+        user.setName(name);
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode("toor"));
+        user.setRole(role);
+        user.setEmail(email);
+        user.setPhone(phone);
+        user.setEnabled(true);
+        return user;
     }
 
-    private static Room getRoom(Hotel hotel1) {
-        Room room1 = new Room();
-        room1.setHotel(hotel1);
-        room1.setNumber(101);
-        room1.setType("Deluxe");
-        room1.setPricePerNight(100.0);
-        room1.setCapacity(4);
-        room1.setStatus(RoomStatus.AVAILABLE);
-        room1.setDescription("A room that is deluxe");
-        room1.setImageUrls(new HashSet<>(List.of(
-                "http://example.com/room1/image1.jpg",
-                "http://example.com/room1/image2.jpg"
-        )));
-        room1.setHotel(hotel1);
-        return room1;
+    private List<Amenity> createAmenities() {
+        List<Amenity> amenities = List.of(
+                createAmenity("WiFi", "High-speed internet"),
+                createAmenity("Swimming Pool", "A pool for swimming"),
+                createAmenity("Gym", "Gym for fitness freaks"),
+                createAmenity("Spa", "Relaxing spa services"),
+                createAmenity("Parking", "Free parking space"),
+                createAmenity("Restaurant", "In-house restaurant"),
+                createAmenity("Bar", "In-house bar"),
+                createAmenity("Laundry", "Laundry services"),
+                createAmenity("Room Service", "24/7 room service"),
+                createAmenity("Conference Room", "Conference facilities"),
+                createAmenity("Pet Friendly", "Pets allowed"),
+                createAmenity("Airport Shuttle", "Airport shuttle service")
+        );
+        amenityRepository.saveAll(amenities);
+        return amenities;
     }
 
-    private static Hotel getHotel2(List<Amenity> amenities, User admin) {
-        Hotel hotel2 = new Hotel();
-        hotel2.setName("Hotel Moonlight");
-        hotel2.setAddress("456 Moonlight Ave, Moonville");
-        hotel2.setCity("Moonville");
-        hotel2.setState("Moonland");
-        hotel2.setZip("456622");
-        hotel2.setRating(4.2);
-        hotel2.setDescription("A hotel that shines like the moon.");
-        hotel2.setImageUrls(new HashSet<>(List.of(
-                "http://example.com/hotel2/image1.jpg",
-                "http://example.com/hotel2/image2.jpg"
-        )));
-        hotel2.setAmenities(new HashSet<>(amenities));
-        hotel2.setAdmin(admin);
-        return hotel2;
+    private Amenity createAmenity(String name, String description) {
+        Amenity amenity = new Amenity();
+        amenity.setName(name);
+        amenity.setDescription(description);
+        return amenity;
     }
 
-    private static Hotel getHotel(List<Amenity> amenities, User admin) {
-        Hotel hotel1 = new Hotel();
-        hotel1.setName("Hotel Sunshine");
-        hotel1.setAddress("123 Sunshine St, Sunnyville");
-        hotel1.setCity("Sunnyville");
-        hotel1.setState("Sunnyland");
-        hotel1.setZip("123311");
-        hotel1.setRating(4.5);
-        hotel1.setDescription("A hotel that shines like the sun.");
-        hotel1.setImageUrls(new HashSet<>(List.of(
-                "http://example.com/hotel1/image1.jpg",
-                "http://example.com/hotel1/image2.jpg"
+    private List<Hotel> createHotels(List<Amenity> amenities) {
+        List<Hotel> hotels = List.of(
+                createHotel("Hotel Sunshine", "123 Sunshine St, Sunnyville", "Sunnyville", "Sunnyland", "123311", 4.5, "A hotel that shines like the sun.", amenities, userRepository.findByUsername("hotel1").orElse(null)),
+                createHotel("Hotel Moonlight", "456 Moonlight Ave, Moonville", "Moonville", "Moonland", "456622", 4.2, "A hotel that shines like the moon.", amenities, userRepository.findByUsername("hotel2").orElse(null)),
+                createHotel("Hotel Starlight", "789 Starlight Blvd, Starcity", "Starcity", "Starland", "789933", 4.7, "A hotel that shines like the stars.", amenities, userRepository.findByUsername("hotel3").orElse(null)),
+                createHotel("Hotel Twilight", "101 Twilight Rd, Twilightown", "Twilightown", "Twilightland", "101122", 4.3, "A hotel that shines like the twilight.", amenities, userRepository.findByUsername("hotel1").orElse(null))
+        );
+        hotelRepository.saveAll(hotels);
+        return hotels;
+    }
+
+    private Hotel createHotel(String name, String address, String city, String state, String zip, double rating, String description, List<Amenity> amenities, User admin) {
+        Hotel hotel = new Hotel();
+        hotel.setName(name);
+        hotel.setAddress(address);
+        hotel.setCity(city);
+        hotel.setState(state);
+        hotel.setZip(zip);
+        hotel.setRating(rating);
+        hotel.setDescription(description);
+        hotel.setImageUrls(new HashSet<>(List.of(
+                "http://example.com/" + name.toLowerCase().replace(" ", "") + "/image1.jpg",
+                "http://example.com/" + name.toLowerCase().replace(" ", "") + "/image2.jpg"
         )));
-        hotel1.setAmenities(new HashSet<>(amenities));
-        hotel1.setAdmin(admin);
-        return hotel1;
+        hotel.setAmenities(new HashSet<>(amenities));
+        hotel.setAdmin(admin);
+        return hotel;
+    }
+
+    private void createRooms(List<Hotel> hotels) {
+        hotels.forEach(hotel -> IntStream.range(1, 6).forEach(i -> {
+            Room room = new Room();
+            room.setHotel(hotel);
+            room.setNumber(i * 100 + hotel.getId().intValue());
+            room.setType(i % 2 == 0 ? "Standard" : "Deluxe");
+            room.setPricePerNight(50.0 + i * 10);
+            room.setCapacity(i % 2 == 0 ? 2 : 4);
+            room.setStatus(RoomStatus.AVAILABLE);
+            room.setDescription("A " + room.getType().toLowerCase() + " room");
+            room.setImageUrls(new HashSet<>(List.of(
+                    "http://example.com/room" + room.getNumber() + "/image1.jpg",
+                    "http://example.com/room" + room.getNumber() + "/image2.jpg"
+            )));
+            roomRepository.save(room);
+        }));
+    }
+
+    private void createReservations() {
+        List<User> users = userRepository.findAll().stream().filter(user -> user.getRole() == UserRole.USER).toList();
+        List<Room> rooms = roomRepository.findAll();
+        IntStream.range(0, 30).forEach(i -> {
+            Reservation reservation = new Reservation();
+            reservation.setUser(users.get(i % users.size()));
+            reservation.setRoom(rooms.get(i % rooms.size()));
+            reservation.setCheckIn(LocalDate.of(2025, 1, 1).plusDays(i));
+            reservation.setCheckOut(LocalDate.of(2025, 1, 5).plusDays(i));
+            reservation.setReservationDate(LocalDate.now());
+            reservation.setNumberOfGuests(2 + i % 3);
+            reservation.setTotalPrice(100.0 + i * 10);
+            reservation.setStatus(i % 2 == 0 ? ReservationStatus.PENDING : ReservationStatus.CONFIRMED);
+            reservationRepository.save(reservation);
+        });
     }
 }
