@@ -1,7 +1,6 @@
 package com.akm.hotelmanagement.service;
 
 import com.akm.hotelmanagement.dto.hotel.CreateHotelRequestDto;
-import com.akm.hotelmanagement.dto.hotel.HotelInternalResponseDto;
 import com.akm.hotelmanagement.dto.hotel.HotelResponseDto;
 import com.akm.hotelmanagement.dto.hotel.UpdateHotelRequestDto;
 import com.akm.hotelmanagement.entity.Hotel;
@@ -52,8 +51,8 @@ public class HotelService {
     }
 
     @Transactional(readOnly = true)
-    public HotelInternalResponseDto getHotelByAdminUsername(String username) {
-        return hotelMapper.toInternalResponseDto(hotelRepository.findByAdminUsername(username).orElseThrow(
+    public HotelResponseDto getHotelByAdminUsername(String username) {
+        return hotelMapper.toResponseDto(hotelRepository.findByAdminUsername(username).orElseThrow(
                 () -> new ResourceNotFoundException("Hotel not found with admin username: " + username)
         ));
     }
