@@ -9,6 +9,11 @@ This project is currently under **active development**, meaning new features and
 - The **test suite is outdated**, as changes have been made after the initial tests were written.
 - As the developer, I am currently **learning how to write tests in Spring Boot**, so testing is an ongoing improvement process.
 - Some features have been **manually tested and are working**, but automated tests may not fully cover them yet.
+- The **documentation is incomplete**, and some parts of the code may not be fully explained.
+- The **project structure and code quality** are being improved over time.
+- **Feedback and contributions** are welcome!
+- However, the project is **fully functional** and can be run locally.
+- **Please check the `run-local` branch** for the latest updates and features.
 
 ## Overview
 
@@ -17,9 +22,6 @@ This is a Hotel Management System built with Java, Spring Boot, and Maven. It is
 ## Steps to Run the Project Locally
 ### Running the Project
 To check out the project, clone the **`run-local`** branch and follow the setup instructions to run it locally. Feedback and contributions are welcome!
-
-### Project Requirements
-- Java 23
 
 ### 1. Clone the Repository
 Clone the project repository from GitHub to your local machine and switch to the `run-local` branch.
@@ -194,7 +196,6 @@ Tried to wrap all responses in a `ResponseWrapper` class to provide a consistent
 - Swagger
 - HATEOAS
 - Spring Security
-- MapStruct
 
 ## License
 
