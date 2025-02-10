@@ -362,7 +362,7 @@ public class HotelAdminController extends AdminBaseController {
     }
 
     private boolean isNotValidHotelAdmin(Long hotelId, String username) {
-        return !Objects.equals(hotelService.getHotelByAdminUsername(username).getId(), hotelId);
+        return !Objects.equals(hotelService.getHotelsByAdminUsername(username).stream().anyMatch(hotel -> hotel.getId().equals(hotelId)), true);
     }
 
     private boolean isNotValidHotelRoom(Long hotelId, Long roomId) {

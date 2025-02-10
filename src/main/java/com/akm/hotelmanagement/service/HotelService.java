@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
@@ -51,10 +53,8 @@ public class HotelService {
     }
 
     @Transactional(readOnly = true)
-    public HotelResponseDto getHotelByAdminUsername(String username) {
-        return hotelMapper.toResponseDto(hotelRepository.findByAdminUsername(username).orElseThrow(
-                () -> new ResourceNotFoundException("Hotel not found with admin username: " + username)
-        ));
+    public List<HotelResponseDto> getHotelsByAdminUsername(String username) {
+        return hotelRepository.findAllByAdminUsername(username).stream().map(hotelMapper::toResponseDto).collect(Collectors.toList());
     }
 
     @Transactional
