@@ -192,7 +192,7 @@ public class ReservationService {
         if (reservation.getStatus() == ReservationStatus.CHECKED_IN || reservation.getStatus() == ReservationStatus.CHECKED_OUT) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel reservation that is already checked in or checked out");
         }
-        reservation.setStatus(ReservationStatus.CANCELLED);
+        reservation.setStatus(ReservationStatus.CANCELLED_BY_USER);
         return reservationMapper.toResponseDto(reservationRepository.save(reservation));
     }
 }

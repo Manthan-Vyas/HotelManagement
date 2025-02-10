@@ -20,7 +20,7 @@ public class Room {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "number", nullable = false, unique = true)
+    @Column(name = "number", nullable = false)
     private int number;
 
     @Column(name = "type", nullable = false)
@@ -66,5 +66,4 @@ public class Room {
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
-
 }

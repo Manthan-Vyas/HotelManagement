@@ -8,6 +8,7 @@ import com.akm.hotelmanagement.entity.Hotel;
 import com.akm.hotelmanagement.entity.Room;
 import com.akm.hotelmanagement.repository.AmenityRepository;
 import com.akm.hotelmanagement.repository.RoomRepository;
+import com.akm.hotelmanagement.repository.UserRepository;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class HotelMapper {
     private final RoomRepository roomRepository;
     private final AmenityRepository amenityRepository;
+    private final UserRepository userRepository;
 
     public CreateHotelRequestDto toCreateDto(@NotNull Hotel hotel) {
         return new CreateHotelRequestDto(
@@ -32,7 +34,8 @@ public class HotelMapper {
                 hotel.getZip(),
                 hotel.getDescription(),
                 hotel.getRating(),
-                hotel.getImageUrls()
+                hotel.getImageUrls(),
+                hotel.getAdmin().getUsername()
         );
     }
 
@@ -75,6 +78,10 @@ public class HotelMapper {
         hotel.setDescription(hotelDTO.getDescription());
         hotel.setRating(hotelDTO.getRating());
         hotel.setImageUrls(hotelDTO.getImageUrls());
+        hotel.setAdmin(
+                userRepository.findByUsername(hotelDTO.getAdminUsername())
+                        .orElseThrow(() -> new IllegalArgumentException("Hotel Admin not found"))
+        );
         return hotel;
     }
 

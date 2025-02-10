@@ -34,9 +34,6 @@ public class RoomService {
 
     @Transactional
     public RoomResponseDto createRoom(CreateHotelRoomRequestDto roomCreateDto, Long hotelId) {
-        if (roomRepository.existsByNumber(roomCreateDto.getNumber())) {
-            throw new ResourceAlreadyExistsException("Room already exists with number: " + roomCreateDto.getNumber());
-        }
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id: " + hotelId));
         Room room = roomMapper.toEntity(roomCreateDto);
