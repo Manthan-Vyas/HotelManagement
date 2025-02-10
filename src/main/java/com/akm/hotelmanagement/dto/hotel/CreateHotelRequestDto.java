@@ -36,4 +36,6 @@ public class CreateHotelRequestDto implements Serializable {
     @PositiveOrZero(message = "{error.hotel.rating}")
     double rating;
     Set<String> imageUrls;
+    @NotBlank(message = "{error.required.username}")
+    String adminUsername;
 }

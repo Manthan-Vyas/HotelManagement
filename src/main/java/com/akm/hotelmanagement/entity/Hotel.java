@@ -52,4 +52,7 @@ public class Hotel {
             inverseJoinColumns = @JoinColumn(name = "amenities_id"))
     private Set<Amenity> amenities = new LinkedHashSet<>();
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "admin_user_id", nullable = false)
+    private User admin;
 }

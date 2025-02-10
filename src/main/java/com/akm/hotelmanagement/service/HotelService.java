@@ -1,6 +1,7 @@
 package com.akm.hotelmanagement.service;
 
 import com.akm.hotelmanagement.dto.hotel.CreateHotelRequestDto;
+import com.akm.hotelmanagement.dto.hotel.HotelInternalResponseDto;
 import com.akm.hotelmanagement.dto.hotel.HotelResponseDto;
 import com.akm.hotelmanagement.dto.hotel.UpdateHotelRequestDto;
 import com.akm.hotelmanagement.entity.Hotel;
@@ -41,6 +42,20 @@ public class HotelService {
         return hotelRepository.findById(id)
                 .map(hotelMapper::toResponseDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public HotelResponseDto getHotelByRoomId(Long roomId) {
+        return hotelMapper.toResponseDto(hotelRepository.findAll(where(HotelSpecifications.hasFilter("room-id", roomId.toString()))).stream().findFirst().orElseThrow(
+                () -> new ResourceNotFoundException("Hotel not found with room id: " + roomId)
+        ));
+    }
+
+    @Transactional(readOnly = true)
+    public HotelInternalResponseDto getHotelByAdminUsername(String username) {
+        return hotelMapper.toInternalResponseDto(hotelRepository.findByAdminUsername(username).orElseThrow(
+                () -> new ResourceNotFoundException("Hotel not found with admin username: " + username)
+        ));
     }
 
     @Transactional

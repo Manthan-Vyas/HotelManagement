@@ -1,6 +1,7 @@
 package com.akm.hotelmanagement.mapper;
 
 import com.akm.hotelmanagement.dto.hotel.CreateHotelRequestDto;
+import com.akm.hotelmanagement.dto.hotel.HotelInternalResponseDto;
 import com.akm.hotelmanagement.dto.hotel.HotelResponseDto;
 import com.akm.hotelmanagement.dto.hotel.UpdateHotelRequestDto;
 import com.akm.hotelmanagement.entity.Amenity;
@@ -8,6 +9,7 @@ import com.akm.hotelmanagement.entity.Hotel;
 import com.akm.hotelmanagement.entity.Room;
 import com.akm.hotelmanagement.repository.AmenityRepository;
 import com.akm.hotelmanagement.repository.RoomRepository;
+import com.akm.hotelmanagement.repository.UserRepository;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 public class HotelMapper {
     private final RoomRepository roomRepository;
     private final AmenityRepository amenityRepository;
+    private final UserRepository userRepository;
 
     public CreateHotelRequestDto toCreateDto(@NotNull Hotel hotel) {
         return new CreateHotelRequestDto(
@@ -32,7 +35,8 @@ public class HotelMapper {
                 hotel.getZip(),
                 hotel.getDescription(),
                 hotel.getRating(),
-                hotel.getImageUrls()
+                hotel.getImageUrls(),
+                hotel.getAdmin().getUsername()
         );
     }
 
@@ -45,7 +49,8 @@ public class HotelMapper {
                 hotel.getZip(),
                 hotel.getDescription(),
                 hotel.getRating(),
-                hotel.getImageUrls()
+                hotel.getImageUrls(),
+                hotel.getAdmin().getUsername()
         );
     }
 
@@ -65,6 +70,23 @@ public class HotelMapper {
         );
     }
 
+    public HotelInternalResponseDto toInternalResponseDto(@NotNull Hotel hotel) {
+        return new HotelInternalResponseDto(
+                hotel.getId(),
+                hotel.getName(),
+                hotel.getAddress(),
+                hotel.getCity(),
+                hotel.getState(),
+                hotel.getZip(),
+                hotel.getDescription(),
+                hotel.getRating(),
+                hotel.getImageUrls(),
+                hotel.getRooms().stream().map(Room::getId).collect(Collectors.toSet()),
+                hotel.getAmenities().stream().map(Amenity::getId).collect(Collectors.toSet()),
+                hotel.getAdmin().getUsername()
+        );
+    }
+
     public Hotel toEntity(@NotNull CreateHotelRequestDto hotelDTO) {
         Hotel hotel = new Hotel();
         hotel.setName(hotelDTO.getName());
@@ -75,6 +97,10 @@ public class HotelMapper {
         hotel.setDescription(hotelDTO.getDescription());
         hotel.setRating(hotelDTO.getRating());
         hotel.setImageUrls(hotelDTO.getImageUrls());
+        hotel.setAdmin(
+                userRepository.findByUsername(hotelDTO.getAdminUsername())
+                        .orElseThrow(() -> new IllegalArgumentException("Hotel Admin not found"))
+        );
         return hotel;
     }
 
@@ -106,6 +132,34 @@ public class HotelMapper {
         if (hotelDTO.getImageUrls() != null) {
             hotel.setImageUrls(hotelDTO.getImageUrls());
         }
+        if (hotelDTO.getAdminUsername() != null) {
+            hotel.setAdmin(
+                    userRepository.findByUsername(hotelDTO.getAdminUsername())
+                            .orElseThrow(() -> new IllegalArgumentException("Hotel Admin not found"))
+            );
+        }
+        return hotel;
+    }
+
+    public Hotel toEntity(@NotNull HotelInternalResponseDto hotelDTO) {
+        Hotel hotel = new Hotel();
+        hotel.setId(hotelDTO.getId());
+        hotel.setName(hotelDTO.getName());
+        hotel.setAddress(hotelDTO.getAddress());
+        hotel.setCity(hotelDTO.getCity());
+        hotel.setState(hotelDTO.getState());
+        hotel.setZip(hotelDTO.getZip());
+        hotel.setDescription(hotelDTO.getDescription());
+        hotel.setRating(hotelDTO.getRating());
+        hotel.setImageUrls(hotelDTO.getImageUrls());
+        Set<Room> rooms = hotelDTO.getRoomIds().stream().map(roomRepository::findById).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+        hotel.setRooms(rooms);
+        Set<Amenity> amenities = hotelDTO.getAmenityIds().stream().map(amenityRepository::findById).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+        hotel.setAmenities(amenities);
+        hotel.setAdmin(
+                userRepository.findByUsername(hotelDTO.getAdminUsername())
+                        .orElseThrow(() -> new IllegalArgumentException("Hotel Admin not found"))
+        );
         return hotel;
     }
 
