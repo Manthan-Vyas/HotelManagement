@@ -141,7 +141,8 @@ public class HotelService {
     }
 
     private void checkForDuplicateFields(UpdateHotelRequestDto dto, Hotel hotel) {
-        if (dto.getName() != null && !dto.getName().equals(hotel.getName())) {
+        if (dto.getName() != null && dto.getName().equals(hotel.getName())) {
+            System.out.println(dto.getName() + " " + hotel.getName());
             throw new ResourceAlreadyExistsException("Name is same as the existing one " + dto.getName()); // todo: how to i18n this? cause it requires another property like name dto.getName()
         }
         if (dto.getAddress() != null && dto.getAddress().equals(hotel.getAddress())) {
