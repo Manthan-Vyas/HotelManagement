@@ -48,8 +48,7 @@ public class HotelMapper {
                 hotel.getZip(),
                 hotel.getDescription(),
                 hotel.getRating(),
-                hotel.getImageUrls(),
-                hotel.getAdmin().getUsername()
+                hotel.getImageUrls()
         );
     }
 
@@ -113,12 +112,6 @@ public class HotelMapper {
         }
         if (hotelDTO.getImageUrls() != null) {
             hotel.setImageUrls(hotelDTO.getImageUrls());
-        }
-        if (hotelDTO.getAdminUsername() != null) {
-            hotel.setAdmin(
-                    userRepository.findByUsername(hotelDTO.getAdminUsername())
-                            .orElseThrow(() -> new IllegalArgumentException("Hotel Admin not found"))
-            );
         }
         return hotel;
     }

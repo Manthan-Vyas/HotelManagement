@@ -43,8 +43,6 @@ public class UpdateHotelRequestDto implements Serializable {
     Double rating;
     @Nullable
     Set<String> imageUrls;
-    @NullableNotBlank(message = "{error.nullable.blank.username}")
-    String adminUsername;
 
     public boolean hasAllFieldsNull() {
         return this.getName() == null && this.getAddress() == null && this.getCity() == null && this.getState() == null && this.getZip() == null && this.getDescription() == null && this.getRating() == null && this.getImageUrls() == null;
