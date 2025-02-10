@@ -68,6 +68,7 @@ public class DataInitializer {
             hotelAdmin.setRole(UserRole.HOTEL_ADMIN);
             hotelAdmin.setEmail("hoteladmin@example.com");
             hotelAdmin.setPhone("0987654321");
+            hotelAdmin.setEnabled(true);
             userRepository.save(hotelAdmin);
 
             User user = new User();
@@ -77,6 +78,7 @@ public class DataInitializer {
             user.setRole(UserRole.USER);
             user.setEmail("user@example.com");
             user.setPhone("1122334455");
+            user.setEnabled(true);
             userRepository.save(user);
 
             // Create Amenities
