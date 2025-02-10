@@ -294,7 +294,7 @@ public class HotelAdminController extends AdminBaseController {
         );
     }
 
-    @PatchMapping("/hotels/{hotelId}/rooms/{roomId}/satus")
+    @PatchMapping("/hotels/{hotelId}/rooms/{roomId}/status")
     @Operation(summary = "Update room status", description = "Update the status of a room by providing the hotel id, room id, and the new status")
     public ResponseEntity<ResponseWrapper<RoomModel>> updateHotelRoom(
             @PathVariable Long hotelId, @PathVariable Long roomId,
